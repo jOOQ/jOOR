@@ -38,6 +38,9 @@ package org.joor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * A wrapper for an {@link Object} or {@link Class} upon which reflective calls
@@ -218,6 +221,34 @@ public class Reflect {
         catch (Exception e) {
             throw new ReflectException(e);
         }
+    }
+
+    /**
+     * Get a Map containing field names and wrapped values for the fields'
+     * values.
+     * <p>
+     * If the wrapped object is a {@link Class}, then this will return static
+     * fields. If the wrapped object is any other {@link Object}, then this will
+     * return instance fields.
+     * <p>
+     * These two calls are equivalent <code><pre>
+     * on(object).field("myField");
+     * on(object).fields().get("myField");
+     * </pre></code>
+     *
+     * @return A map containing field names and wrapped values.
+     */
+    public Map<String, Reflect> fields() {
+        Map<String, Reflect> result = new LinkedHashMap<String, Reflect>();
+
+        for (Field field : type().getFields()) {
+            if (!isClass ^ Modifier.isStatic(field.getModifiers())) {
+                String name = field.getName();
+                result.put(name, field(name));
+            }
+        }
+
+        return result;
     }
 
     /**

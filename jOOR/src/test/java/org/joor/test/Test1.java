@@ -44,6 +44,6 @@ public class Test1 {
     public int            I_INT1;
     public Integer        I_INT2;
 
-    public static Test1    S_DATA;
-    public Test1           I_DATA;
+    public static Test1   S_DATA;
+    public Test1          I_DATA;
 }

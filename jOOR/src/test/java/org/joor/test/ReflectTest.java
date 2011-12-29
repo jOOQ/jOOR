@@ -35,6 +35,7 @@
  */
 package org.joor.test;
 
+import static junit.framework.Assert.assertTrue;
 import static org.joor.Reflect.on;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -186,6 +187,38 @@ public class ReflectTest {
         assertEquals(1, on(Test1.class).field("S_INT2").get());
         assertNull(on(Test1.class).set("S_INT2", null).get("S_INT2"));
         assertNull(on(Test1.class).field("S_INT2").get());
+    }
+
+    @Test
+    public void testFieldMap() {
+        // Instance methods
+        // ----------------
+        Test1 test1 = new Test1();
+        assertEquals(3, on(test1).fields().size());
+        assertTrue(on(test1).fields().containsKey("I_INT1"));
+        assertTrue(on(test1).fields().containsKey("I_INT2"));
+        assertTrue(on(test1).fields().containsKey("I_DATA"));
+
+        assertEquals(1, on(test1).set("I_INT1", 1).fields().get("I_INT1").get());
+        assertEquals(1, on(test1).fields().get("I_INT1").get());
+        assertEquals(1, on(test1).set("I_INT2", 1).fields().get("I_INT2").get());
+        assertEquals(1, on(test1).fields().get("I_INT2").get());
+        assertNull(on(test1).set("I_INT2", null).fields().get("I_INT2").get());
+        assertNull(on(test1).fields().get("I_INT2").get());
+
+        // Static methods
+        // --------------
+        assertEquals(3, on(Test1.class).fields().size());
+        assertTrue(on(Test1.class).fields().containsKey("S_INT1"));
+        assertTrue(on(Test1.class).fields().containsKey("S_INT2"));
+        assertTrue(on(Test1.class).fields().containsKey("S_DATA"));
+
+        assertEquals(1, on(Test1.class).set("S_INT1", 1).fields().get("S_INT1").get());
+        assertEquals(1, on(Test1.class).fields().get("S_INT1").get());
+        assertEquals(1, on(Test1.class).set("S_INT2", 1).fields().get("S_INT2").get());
+        assertEquals(1, on(Test1.class).fields().get("S_INT2").get());
+        assertNull(on(Test1.class).set("S_INT2", null).fields().get("S_INT2").get());
+        assertNull(on(Test1.class).fields().get("S_INT2").get());
     }
 
     @Test
