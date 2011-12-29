@@ -248,13 +248,16 @@ public class Reflect {
      * Just like {@link Method#invoke(Object, Object...)}, this will try to wrap
      * primitive types or unwrap primitive type wrappers if applicable. If
      * several methods are applicable, by that rule, the first one encountered
-     * is called: <code><pre>
+     * is called. i.e. when calling <code><pre>
+     * on(...).call("method", 1, 1);
+     * </pre></code> The first of the following methods will be called:
+     * <code><pre>
      * public void method(int param1, Integer param2);
      * public void method(Integer param1, int param2);
+     * public void method(Number param1, Number param2);
+     * public void method(Number param1, Object param2);
+     * public void method(int param1, Object param2);
      * </pre></code>
-     * <p>
-     * TODO: Find also less specific constructors, e.g. declaring {@link Number}
-     * but receiving {@link Integer}
      *
      * @param name The method name
      * @param args The method arguments
@@ -289,6 +292,20 @@ public class Reflect {
     /**
      * Call a constructor.
      * <p>
+     * This is a convenience method for calling
+     * <code>create(new Object[0])</code>
+     *
+     * @return The wrapped new object, to be used for further reflection.
+     * @throws ReflectException If any reflection exception occurred.
+     * @see #create(Object...)
+     */
+    public Reflect create() throws ReflectException {
+        return create(new Object[0]);
+    }
+
+    /**
+     * Call a constructor.
+     * <p>
      * This is roughly equivalent to {@link Constructor#newInstance(Object...)}.
      * If the wrapped object is a {@link Class}, then this will create a new
      * object of that class. If the wrapped object is any other {@link Object},
@@ -297,13 +314,16 @@ public class Reflect {
      * Just like {@link Constructor#newInstance(Object...)}, this will try to
      * wrap primitive types or unwrap primitive type wrappers if applicable. If
      * several constructors are applicable, by that rule, the first one
-     * encountered is called: <code><pre>
-     * public Constructor(int param1, Integer param2);
-     * public Constructor(Integer param1, int param2);
+     * encountered is called. i.e. when calling <code><pre>
+     * on(C.class).create(1, 1);
+     * </pre></code> The first of the following constructors will be applied:
+     * <code><pre>
+     * public C(int param1, Integer param2);
+     * public C(Integer param1, int param2);
+     * public C(Number param1, Number param2);
+     * public C(Number param1, Object param2);
+     * public C(int param1, Object param2);
      * </pre></code>
-     * <p>
-     * TODO: Find also less specific constructors, e.g. declaring {@link Number}
-     * but receiving {@link Integer}
      *
      * @param args The constructor arguments
      * @return The wrapped new object, to be used for further reflection.
@@ -343,7 +363,7 @@ public class Reflect {
     private boolean match(Class<?>[] declaredTypes, Class<?>[] actualTypes) {
         if (declaredTypes.length == actualTypes.length) {
             for (int i = 0; i < actualTypes.length; i++) {
-                if (wrapper(declaredTypes[i]) != wrapper(actualTypes[i])) {
+                if (!wrapper(declaredTypes[i]).isAssignableFrom(wrapper(actualTypes[i]))) {
                     return false;
                 }
             }
@@ -404,7 +424,13 @@ public class Reflect {
      */
     private static Reflect on(Method method, Object object, Object... args) throws ReflectException {
         try {
-            return on(method.invoke(object, args));
+            if (method.getReturnType() == void.class) {
+                method.invoke(object, args);
+                return on(object);
+            }
+            else {
+                return on(method.invoke(object, args));
+            }
         }
         catch (Exception e) {
             throw new ReflectException(e);

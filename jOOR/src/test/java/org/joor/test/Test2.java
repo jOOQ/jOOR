@@ -38,12 +38,35 @@ package org.joor.test;
 /**
  * @author Lukas Eder
  */
-public class Data {
-    public static int     S_INT1;
-    public static Integer S_INT2;
-    public int            I_INT1;
-    public Integer        I_INT2;
+public class Test2 {
 
-    public static Data    S_DATA;
-    public Data           I_DATA;
+    public final Object          n;
+    public final ConstructorType constructorType;
+
+    public Test2() {
+        this.n = null;
+        this.constructorType = ConstructorType.NO_ARGS;
+    }
+
+    public Test2(Integer n) {
+        this.n = n;
+        this.constructorType = ConstructorType.INTEGER;
+    }
+
+    public Test2(Number n) {
+        this.n = n;
+        this.constructorType = ConstructorType.NUMBER;
+    }
+
+    public Test2(Object n) {
+        this.n = n;
+        this.constructorType = ConstructorType.OBJECT;
+    }
+
+    public static enum ConstructorType {
+        NO_ARGS,
+        INTEGER,
+        NUMBER,
+        OBJECT
+    }
 }

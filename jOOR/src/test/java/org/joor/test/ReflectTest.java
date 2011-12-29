@@ -41,6 +41,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import org.joor.ReflectException;
+import org.joor.test.Test2.ConstructorType;
+import org.joor.test.Test3.MethodType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -80,6 +82,31 @@ public class ReflectTest {
     }
 
     @Test
+    public void testConstructorsWithAmbiguity() {
+        Test2 test;
+
+        test = on(Test2.class).create().get();
+        assertEquals(null, test.n);
+        assertEquals(ConstructorType.NO_ARGS, test.constructorType);
+
+        test = on(Test2.class).create("abc").get();
+        assertEquals("abc", test.n);
+        assertEquals(ConstructorType.OBJECT, test.constructorType);
+
+        test = on(Test2.class).create(new Long("1")).get();
+        assertEquals(1L, test.n);
+        assertEquals(ConstructorType.NUMBER, test.constructorType);
+
+        test = on(Test2.class).create(1).get();
+        assertEquals(1, test.n);
+        assertEquals(ConstructorType.INTEGER, test.constructorType);
+
+        test = on(Test2.class).create('a').get();
+        assertEquals('a', test.n);
+        assertEquals(ConstructorType.OBJECT, test.constructorType);
+    }
+
+    @Test
     public void testMethods() {
         // Instance methods
         // ----------------
@@ -103,47 +130,84 @@ public class ReflectTest {
     }
 
     @Test
-    public void testFields() {
+    public void testVoidMethods() {
         // Instance methods
         // ----------------
-        Data data = new Data();
-        assertEquals(1, on(data).set("I_INT1", 1).get("I_INT1"));
-        assertEquals(1, on(data).field("I_INT1").get());
-        assertEquals(1, on(data).set("I_INT2", 1).get("I_INT2"));
-        assertEquals(1, on(data).field("I_INT2").get());
-        assertNull(on(data).set("I_INT2", null).get("I_INT2"));
-        assertNull(on(data).field("I_INT2").get());
+        Test4 test4 = new Test4();
+        assertEquals(test4, on(test4).call("i_method").get());
 
         // Static methods
         // --------------
-        assertEquals(1, on(Data.class).set("S_INT1", 1).get("S_INT1"));
-        assertEquals(1, on(Data.class).field("S_INT1").get());
-        assertEquals(1, on(Data.class).set("S_INT2", 1).get("S_INT2"));
-        assertEquals(1, on(Data.class).field("S_INT2").get());
-        assertNull(on(Data.class).set("S_INT2", null).get("S_INT2"));
-        assertNull(on(Data.class).field("S_INT2").get());
+        assertEquals(Test4.class, on(Test4.class).call("s_method").get());
+    }
+
+    @Test
+    public void testMethodsWithAmbiguity() {
+        Test3 test;
+
+        test = on(Test3.class).create().call("method").get();
+        assertEquals(null, test.n);
+        assertEquals(MethodType.NO_ARGS, test.methodType);
+
+        test = on(Test3.class).create().call("method", "abc").get();
+        assertEquals("abc", test.n);
+        assertEquals(MethodType.OBJECT, test.methodType);
+
+        test = on(Test3.class).create().call("method", new Long("1")).get();
+        assertEquals(1L, test.n);
+        assertEquals(MethodType.NUMBER, test.methodType);
+
+        test = on(Test3.class).create().call("method", 1).get();
+        assertEquals(1, test.n);
+        assertEquals(MethodType.INTEGER, test.methodType);
+
+        test = on(Test3.class).create().call("method", 'a').get();
+        assertEquals('a', test.n);
+        assertEquals(MethodType.OBJECT, test.methodType);
+    }
+
+    @Test
+    public void testFields() {
+        // Instance methods
+        // ----------------
+        Test1 test1 = new Test1();
+        assertEquals(1, on(test1).set("I_INT1", 1).get("I_INT1"));
+        assertEquals(1, on(test1).field("I_INT1").get());
+        assertEquals(1, on(test1).set("I_INT2", 1).get("I_INT2"));
+        assertEquals(1, on(test1).field("I_INT2").get());
+        assertNull(on(test1).set("I_INT2", null).get("I_INT2"));
+        assertNull(on(test1).field("I_INT2").get());
+
+        // Static methods
+        // --------------
+        assertEquals(1, on(Test1.class).set("S_INT1", 1).get("S_INT1"));
+        assertEquals(1, on(Test1.class).field("S_INT1").get());
+        assertEquals(1, on(Test1.class).set("S_INT2", 1).get("S_INT2"));
+        assertEquals(1, on(Test1.class).field("S_INT2").get());
+        assertNull(on(Test1.class).set("S_INT2", null).get("S_INT2"));
+        assertNull(on(Test1.class).field("S_INT2").get());
     }
 
     @Test
     public void testFieldAdvanced() {
-        on(Data.class).set("S_DATA", on(Data.class).create())
+        on(Test1.class).set("S_DATA", on(Test1.class).create())
                       .field("S_DATA")
-                      .set("I_DATA", on(Data.class).create())
+                      .set("I_DATA", on(Test1.class).create())
                       .field("I_DATA")
                       .set("I_INT1", 1)
                       .set("S_INT1", 2);
-        assertEquals(2, Data.S_INT1);
-        assertEquals(null, Data.S_INT2);
-        assertEquals(0, Data.S_DATA.I_INT1);
-        assertEquals(null, Data.S_DATA.I_INT2);
-        assertEquals(1, Data.S_DATA.I_DATA.I_INT1);
-        assertEquals(null, Data.S_DATA.I_DATA.I_INT2);
+        assertEquals(2, Test1.S_INT1);
+        assertEquals(null, Test1.S_INT2);
+        assertEquals(0, Test1.S_DATA.I_INT1);
+        assertEquals(null, Test1.S_DATA.I_INT2);
+        assertEquals(1, Test1.S_DATA.I_DATA.I_INT1);
+        assertEquals(null, Test1.S_DATA.I_DATA.I_INT2);
     }
 
     @Before
     public void setUp() {
-        Data.S_INT1 = 0;
-        Data.S_INT2 = null;
-        Data.S_DATA = null;
+        Test1.S_INT1 = 0;
+        Test1.S_INT2 = null;
+        Test1.S_DATA = null;
     }
 }
