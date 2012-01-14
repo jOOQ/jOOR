@@ -237,6 +237,25 @@ public class ReflectTest {
         assertEquals(null, Test1.S_DATA.I_DATA.I_INT2);
     }
 
+    @Test
+    public void testProxy() {
+        assertEquals("abc", on((Object) "abc").as(Test5.class).substring(0));
+        assertEquals("bc", on((Object) "abc").as(Test5.class).substring(1));
+        assertEquals("c", on((Object) "abc").as(Test5.class).substring(2));
+
+        assertEquals("a", on((Object) "abc").as(Test5.class).substring(0, 1));
+        assertEquals("b", on((Object) "abc").as(Test5.class).substring(1, 2));
+        assertEquals("c", on((Object) "abc").as(Test5.class).substring(2, 3));
+
+        assertEquals("abc", on((Object) "abc").as(Test5.class).substring(new Integer(0)));
+        assertEquals("bc", on((Object) "abc").as(Test5.class).substring(new Integer(1)));
+        assertEquals("c", on((Object) "abc").as(Test5.class).substring(new Integer(2)));
+
+        assertEquals("a", on((Object) "abc").as(Test5.class).substring(new Integer(0), new Integer(1)));
+        assertEquals("b", on((Object) "abc").as(Test5.class).substring(new Integer(1), new Integer(2)));
+        assertEquals("c", on((Object) "abc").as(Test5.class).substring(new Integer(2), new Integer(3)));
+    }
+
     @Before
     public void setUp() {
         Test1.S_INT1 = 0;

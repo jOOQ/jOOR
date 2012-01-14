@@ -37,8 +37,10 @@ package org.joor;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -381,6 +383,25 @@ public class Reflect {
 
             throw new ReflectException(e);
         }
+    }
+
+    /**
+     * Create a proxy for the wrapped object allowing to typesafely invoke
+     * methods on it using a custom interface
+     *
+     * @param proxyType The interface type that is implemented by the proxy
+     * @return A proxy for the wrapped object
+     */
+    @SuppressWarnings("unchecked")
+    public <P> P as(Class<P> proxyType) {
+        final InvocationHandler handler = new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                return on(object).call(method.getName(), args).get();
+            }
+        };
+
+        return (P) Proxy.newProxyInstance(proxyType.getClassLoader(), new Class[] { proxyType }, handler);
     }
 
     // ---------------------------------------------------------------------
