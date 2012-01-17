@@ -199,7 +199,7 @@ public class Reflect {
      * @throws ReflectException If any reflection exception occurred.
      * @see #field(String)
      */
-    public Object get(String name) throws ReflectException {
+    public <T> T get(String name) throws ReflectException {
         return field(name).get();
     }
 
