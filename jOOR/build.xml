@@ -5,7 +5,7 @@
 
 	<!-- Run a full mvn clean package install deploy first before this -->
 	<target name="release" description="Release a new version">
-		<property name="version" value="0.9.1-SNAPSHOT"/>
+		<property name="version" value="0.9.1"/>
 
 		<mkdir dir="${dir.release}/versions" />
 		<mkdir dir="${dir.release}/${version}" />

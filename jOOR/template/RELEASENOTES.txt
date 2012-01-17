@@ -2,6 +2,18 @@ jOOX Release notes
 ------------------
 For an overview, see also http://code.google.com/p/joor/issues/list
 
+Version 0.9.1
+=================================================================
+
+Features and improvements
+-------------------------
+#3   - Make Object Reflect.get(String) generic:
+       <T> T Reflect.get(String)
+#2   - Add <P> P Reflect.as(Class<P>) using
+       java.lang.reflect.Proxy and
+       java.lang.reflect.InvocationHandler
+#1   - Add Map<String, Reflect> Reflect.fields()
+
 Version 0.9.0
 =================================================================
 
