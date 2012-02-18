@@ -140,12 +140,6 @@ public class Reflect {
     }
 
     // ---------------------------------------------------------------------
-    // Fluent Configuration API
-    // ---------------------------------------------------------------------
-
-    // TODO: Allow for accessing non-public members, methods, etc
-
-    // ---------------------------------------------------------------------
     // Fluent Reflection API
     // ---------------------------------------------------------------------
 
@@ -519,8 +513,11 @@ public class Reflect {
      * Wrap an object returned from a method
      */
     private static Reflect on(Method method, Object object, Object... args) throws ReflectException {
+        boolean accessible = method.isAccessible();
+
         try {
-            method.setAccessible(true);
+            if (!accessible)
+                method.setAccessible(true);
 
             if (method.getReturnType() == void.class) {
                 method.invoke(object, args);
@@ -532,6 +529,11 @@ public class Reflect {
         }
         catch (Exception e) {
             throw new ReflectException(e);
+        }
+        finally {
+            if (!accessible) {
+                method.setAccessible(false);
+            }
         }
     }
 
