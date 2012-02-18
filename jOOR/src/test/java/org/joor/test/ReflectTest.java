@@ -36,9 +36,11 @@
 package org.joor.test;
 
 import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
 import static org.joor.Reflect.on;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.joor.ReflectException;
@@ -256,10 +258,26 @@ public class ReflectTest {
         assertEquals("c", on((Object) "abc").as(Test5.class).substring(new Integer(2), new Integer(3)));
     }
 
+    @Test
+    public void setPrivateField() throws Exception {
+        Foo foo = new Foo();
+        on(foo).set("bar", "FooBar");
+        assertThat(foo.bar, is("FooBar"));
+        assertEquals("FooBar", on(foo).get("bar"));
+
+        on(foo).set("bar", null);
+        assertNull(foo.bar);
+        assertNull(on(foo).get("bar"));
+    }
+
     @Before
     public void setUp() {
         Test1.S_INT1 = 0;
         Test1.S_INT2 = null;
         Test1.S_DATA = null;
+    }
+
+    private class Foo {
+        private String bar;
     }
 }

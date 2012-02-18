@@ -174,12 +174,34 @@ public class Reflect {
      */
     public Reflect set(String name, Object value) throws ReflectException {
         try {
+
+            // Try setting a public field
             Field field = type().getField(name);
             field.set(object, unwrap(value));
             return this;
         }
-        catch (Exception e) {
-            throw new ReflectException(e);
+        catch (Exception e1) {
+            boolean accessible = true;
+            Field field = null;
+
+            // Try again, setting a non-public field
+            try {
+                field = type().getDeclaredField(name);
+                accessible = field.isAccessible();
+                if (!accessible)
+                    field.setAccessible(true);
+
+                field.set(object, unwrap(value));
+                return this;
+            }
+            catch (Exception e2) {
+                throw new ReflectException(e2);
+            }
+            finally {
+                if (field != null && !accessible) {
+                    field.setAccessible(false);
+                }
+            }
         }
     }
 
@@ -217,11 +239,33 @@ public class Reflect {
      */
     public Reflect field(String name) throws ReflectException {
         try {
+
+             // Try getting a public field
             Field field = type().getField(name);
             return on(field.get(object));
         }
-        catch (Exception e) {
-            throw new ReflectException(e);
+        catch (Exception e1) {
+            Field field = null;
+            boolean accessible = true;
+
+            // Try again, getting a non-public field
+            try {
+                field = type().getDeclaredField(name);
+                accessible = field.isAccessible();
+
+                if (!accessible)
+                    field.setAccessible(true);
+
+                return on(field.get(object));
+            }
+            catch (Exception e2) {
+                throw new ReflectException(e2);
+            }
+            finally {
+                if (field != null && !accessible) {
+                    field.setAccessible(false);
+                }
+            }
         }
     }
 
@@ -582,4 +626,5 @@ public class Reflect {
             return type;
         }
     }
+
 }
