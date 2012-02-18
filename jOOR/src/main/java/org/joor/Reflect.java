@@ -476,6 +476,8 @@ public class Reflect {
      */
     private static Reflect on(Method method, Object object, Object... args) throws ReflectException {
         try {
+            method.setAccessible(true);
+
             if (method.getReturnType() == void.class) {
                 method.invoke(object, args);
                 return on(object);
