@@ -259,7 +259,11 @@ public class ReflectTest {
     }
 
     @Test
-    public void setPrivateField() throws Exception {
+    public void testPrivateField() throws Exception {
+        class Foo {
+            private String bar;
+        }
+
         Foo foo = new Foo();
         on(foo).set("bar", "FooBar");
         assertThat(foo.bar, is("FooBar"));
@@ -270,14 +274,18 @@ public class ReflectTest {
         assertNull(on(foo).get("bar"));
     }
 
+    @Test
+    public void testType() throws Exception {
+        assertEquals(Object.class, on(new Object()).type());
+        assertEquals(Object.class, on(Object.class).type());
+        assertEquals(Integer.class, on(1).type());
+        assertEquals(Integer.class, on(Integer.class).type());
+    }
+
     @Before
     public void setUp() {
         Test1.S_INT1 = 0;
         Test1.S_INT2 = null;
         Test1.S_DATA = null;
-    }
-
-    private class Foo {
-        private String bar;
     }
 }

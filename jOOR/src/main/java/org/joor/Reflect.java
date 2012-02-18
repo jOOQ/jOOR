@@ -584,7 +584,7 @@ public class Reflect {
      *
      * @see Object#getClass()
      */
-    private Class<?> type() {
+    public Class<?> type() {
         if (isClass) {
             return (Class<?>) object;
         }
