@@ -27,9 +27,9 @@
 	</licenses>
 
 	<scm>
-		<developerConnection>scm:svn:https://joor.googlecode.com/svn</developerConnection>
-		<url>https://joor.googlecode.com/svn</url>
-		<connection>scm:svn:https://joor.googlecode.com/svn</connection>
+		<developerConnection>git@github.com:lukaseder/jOOR.git</developerConnection>
+		<url>git@github.com:lukaseder/jOOR.git</url>
+		<connection>git@github.com:lukaseder/jOOR.git</connection>
 	</scm>
 
 	<build>
