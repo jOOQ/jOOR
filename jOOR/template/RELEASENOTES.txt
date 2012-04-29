@@ -2,6 +2,18 @@ jOOX Release notes
 ------------------
 For an overview, see also http://code.google.com/p/joor/issues/list
 
+Version 0.9.3
+=================================================================
+
+Features and improvements
+-------------------------
+
+#12  - Don't reset the accessible flag to false, if setting it to
+       true is required, to avoid race conditions in concurrency
+       contexts
+#13  - Add <T extends AccessibleObject> T Reflect.accessible(T)
+       to conveniently render a reflected object accessible
+
 Version 0.9.2
 =================================================================
 
