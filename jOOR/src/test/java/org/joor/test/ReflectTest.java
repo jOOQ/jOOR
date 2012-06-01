@@ -43,6 +43,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.joor.ReflectException;
 import org.joor.test.Test2.ConstructorType;
 import org.joor.test.Test3.MethodType;
@@ -256,6 +259,44 @@ public class ReflectTest {
         assertEquals("a", on((Object) "abc").as(Test5.class).substring(new Integer(0), new Integer(1)));
         assertEquals("b", on((Object) "abc").as(Test5.class).substring(new Integer(1), new Integer(2)));
         assertEquals("c", on((Object) "abc").as(Test5.class).substring(new Integer(2), new Integer(3)));
+    }
+
+    @Test
+    public void testMapProxy() {
+
+        @SuppressWarnings({ "unused", "serial" })
+        class MyMap extends HashMap<String, Object> {
+            String baz;
+            public void setBaz(String baz) {
+                this.baz = "MyMap: " + baz;
+            }
+
+            public String getBaz() {
+                return baz;
+            }
+        }
+        Map<String, Object> map = new MyMap();
+
+        on(map).as(Test6.class).setFoo("abc");
+        assertEquals(1, map.size());
+        assertEquals("abc", map.get("foo"));
+        assertEquals("abc", on(map).as(Test6.class).getFoo());
+
+        on(map).as(Test6.class).setBar(true);
+        assertEquals(2, map.size());
+        assertEquals(true, map.get("bar"));
+        assertEquals(true, on(map).as(Test6.class).isBar());
+
+        on(map).as(Test6.class).setBaz("baz");
+        assertEquals(2, map.size());
+        assertEquals(null, map.get("baz"));
+        assertEquals("MyMap: baz", on(map).as(Test6.class).getBaz());
+
+        try {
+            on(map).as(Test6.class).testIgnore();
+            fail();
+        }
+        catch (ReflectException expected) {}
     }
 
     @Test
