@@ -11,7 +11,7 @@
 
     <groupId>org.jooq</groupId>
     <artifactId>joor</artifactId>
-    <version>0.9.3</version>
+    <version>0.9.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>jOOR</name>
@@ -27,9 +27,9 @@
     </licenses>
 
     <scm>
-        <developerConnection>git@github.com:lukaseder/jOOR.git</developerConnection>
-        <url>git@github.com:lukaseder/jOOR.git</url>
-        <connection>git@github.com:lukaseder/jOOR.git</connection>
+        <developerConnection>git@github.com:jOOQ/jOOR.git</developerConnection>
+        <url>git@github.com:jOOQ/jOOR.git</url>
+        <connection>git@github.com:jOOQ/jOOR.git</connection>
     </scm>
 
     <build>
