@@ -323,6 +323,13 @@ public class ReflectTest {
         assertEquals(Integer.class, on(Integer.class).type());
     }
 
+    @Test
+    public void testCreateWithNulls() throws Exception {
+        Test2 test2 = on(Test2.class).create((Object) null).<Test2>get();
+        assertNull(test2.n);
+        assertEquals(Test2.ConstructorType.OBJECT, test2.constructorType);
+    }
+
     @Before
     public void setUp() {
         Test1.S_INT1 = 0;
