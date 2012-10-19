@@ -400,7 +400,7 @@ public class Reflect {
         // Try invoking the "canonical" constructor, i.e. the one with exact
         // matching argument types
         try {
-            Constructor<?> constructor = type().getConstructor(types);
+            Constructor<?> constructor = type().getDeclaredConstructor(types);
             return on(constructor, args);
         }
 
@@ -541,7 +541,7 @@ public class Reflect {
      */
     private static Reflect on(Constructor<?> constructor, Object... args) throws ReflectException {
         try {
-            return on(constructor.newInstance(args));
+            return on(accessible(constructor).newInstance(args));
         }
         catch (Exception e) {
             throw new ReflectException(e);

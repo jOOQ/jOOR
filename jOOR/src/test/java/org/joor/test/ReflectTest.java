@@ -88,6 +88,12 @@ public class ReflectTest {
     }
 
     @Test
+    public void testPrivateConstructor() {
+        assertNull(on(PrivateConstructors.class).create().get("string"));
+        assertEquals("abc", on(PrivateConstructors.class).create("abc").get("string"));
+    }
+
+    @Test
     public void testConstructorsWithAmbiguity() {
         Test2 test;
 
