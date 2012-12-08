@@ -42,6 +42,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -323,7 +324,14 @@ public class Reflect {
      * public void method(Number param1, Object param2);
      * public void method(int param1, Object param2);
      * </pre></code>
-     *
+     * <p>
+     * The best matching method is searched for with the following strategy:
+     * <ol>
+     *     <li>public method with exact signature match in class hierarchy</li>
+     *     <li>non-public method with exact signature match on declaring class</li>
+     *     <li>public method with similar signature in class hierarchy</li>
+     *     <li>non-public method with similar signature on declaring class</li>
+     * </ol>
      * @param name The method name
      * @param args The method arguments
      * @return The wrapped method result or the same wrapped object if the
@@ -333,25 +341,118 @@ public class Reflect {
      */
     public Reflect call(String name, Object... args) throws ReflectException {
         Class<?>[] types = types(args);
+        return callTyped(name, types, args);
+    }
+
+    /**
+     * Call a method by its name and explicityl specify the types of the parameters to compare against.
+     * <p>
+     * This is roughly equivalent to {@link Method#invoke(Object, Object...)}.
+     * If the wrapped object is a {@link Class}, then this will invoke a static
+     * method. If the wrapped object is any other {@link Object}, then this will
+     * invoke an instance method.
+     * <p>
+     * Just like {@link Method#invoke(Object, Object...)}, this will try to wrap
+     * primitive types or unwrap primitive type wrappers if applicable. If
+     * several methods are applicable, by that rule, the first one encountered
+     * is called. i.e. when calling <code><pre>
+     * on(...).call("method", 1, 1);
+     * </pre></code> The first of the following methods will be called:
+     * <code><pre>
+     * public void method(int param1, Integer param2);
+     * public void method(Integer param1, int param2);
+     * public void method(Number param1, Number param2);
+     * public void method(Number param1, Object param2);
+     * public void method(int param1, Object param2);
+     * </pre></code>
+     * <p>
+     * The best matching method is searched for with the following strategy:
+     * <ol>
+     *     <li>public method with exact signature match in class hierarchy</li>
+     *     <li>non-public method with exact signature match on declaring class</li>
+     *     <li>public method with similar signature in class hierarchy</li>
+     *     <li>non-public method with similar signature on declaring class</li>
+     * </ol>
+     *
+     * @param name The method name
+     * @param types The types of the arguments to check for in method signatures
+     * @param args The method arguments
+     * @return The wrapped method result or the same wrapped object if the
+     *         method returns <code>void</code>, to be used for further
+     *         reflection.
+     * @throws ReflectException If any reflection exception occurred.
+     */
+    public Reflect callTyped(String name, Class<?>[] types, Object... args) throws ReflectException {
 
         // Try invoking the "canonical" method, i.e. the one with exact
         // matching argument types
         try {
-            Method method = type().getMethod(name, types);
+            Method method = exactMethod(name, types);
             return on(method, object, args);
         }
 
-        // If there is no exact match, try to find one that has a "similar"
+        // If there is no exact match, try to find method that has a "similar"
         // signature if primitive argument types are converted to their wrappers
         catch (NoSuchMethodException e) {
-            for (Method method : type().getMethods()) {
-                if (method.getName().equals(name) && match(method.getParameterTypes(), types)) {
-                    return on(method, object, args);
-                }
+            try {
+                Method method = similarMethod(name, types);
+                return on(method, object, args);
+            } catch (NoSuchMethodException e1) {
+                throw new ReflectException(e1);
             }
-
-            throw new ReflectException(e);
         }
+    }
+
+    /**
+     * Searches a method with the exact same signature as desired.
+     * <p>
+     * If a public method is found in the class hierarchy, this method is returned.
+     * Otherwise a private method with the exact same signature is returned.
+     * If no exact match could be found, we let the {@code NoSuchMethodException} pass through.
+     */
+    private Method exactMethod(String name, Class<?>[] types) throws NoSuchMethodException {
+        final Class<?> type = type();
+
+        // first priority: find a public method with exact signature match in class hierarchy
+        try {
+            return type.getMethod(name, types);
+        } catch (NoSuchMethodException e) {
+            // second priority: find a private method with exact signature match on declaring class
+            return type.getDeclaredMethod(name, types);
+        }
+    }
+
+    /**
+     * Searches a method with a similar signature as desired using {@link #isSimilarSignature(java.lang.reflect.Method, String, Class[])}.
+     * <p>
+     * First public methods are searched in the class hierarchy, then private methods on the declaring class.
+     * If a method could be found, it is returned, otherwise a {@code NoSuchMethodException} is thrown.
+     */
+    private Method similarMethod(String name, Class<?>[] types) throws NoSuchMethodException {
+        final Class<?> type = type();
+
+        // first priority: find a public method with a "similar" signature in class hierarchy
+        // similar interpreted in when primitive argument types are converted to their wrappers
+        for (Method method : type.getMethods()) {
+            if (isSimilarSignature(method, name, types)) {
+                return method;
+            }
+        }
+        // second priority: find a non-public method with a "similar" signature on declaring class
+        for (Method method : type.getDeclaredMethods()) {
+            if (isSimilarSignature(method, name, types)) {
+                return method;
+            }
+        }
+        throw new NoSuchMethodException("No similar method " + name + " with params " + Arrays.toString(types) + " could be found on type " + type() + ".");
+    }
+
+    /**
+     * Determines if a method has a "similar" signature, especially if wrapping primitive argument types would result
+     * in an exactly matching signature.
+     */
+    private boolean isSimilarSignature(Method possiblyMatchingMethod, String desiredMethodName, Class<?>[] desiredParamTypes) {
+        return possiblyMatchingMethod.getName().equals(desiredMethodName) && match(possiblyMatchingMethod.getParameterTypes(), desiredParamTypes);
     }
 
     /**
