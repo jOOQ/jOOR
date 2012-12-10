@@ -154,6 +154,49 @@ public class ReflectTest {
     }
 
     @Test
+    public void testPrivateMethods() throws Exception {
+        // Instance methods
+        // ----------------
+        Test8 test8 = new Test8();
+        assertEquals(test8, on(test8).call("i_method").get());
+
+        // Static methods
+        // --------------
+        assertEquals(Test8.class, on(Test8.class).call("s_method").get());
+
+    }
+
+    @Test
+    public void testPublicMethodsAreFoundInHierarchy() throws Exception {
+        TestHierarchicalMethodsSubclass subclass = new TestHierarchicalMethodsSubclass();
+        assertEquals(TestHierarchicalMethodsBase.PUBLIC_RESULT, on(subclass).call("pub_base_method", 1).get());
+    }
+
+    @Test(expected = ReflectException.class)
+    public void testPrivateMethodsAreNotFoundInHierarchy() throws Exception {
+        TestHierarchicalMethodsSubclass subclass = new TestHierarchicalMethodsSubclass();
+        on(subclass).call("very_priv_method").get();
+    }
+
+    @Test
+    public void testPrivateMethodsAreFoundOnDeclaringClass() throws Exception {
+        TestHierarchicalMethodsSubclass subclass = new TestHierarchicalMethodsSubclass();
+        assertEquals(TestHierarchicalMethodsSubclass.PRIVATE_RESULT, on(subclass).call("priv_method", 1).get());
+
+        TestHierarchicalMethodsBase baseClass = new TestHierarchicalMethodsBase();
+        assertEquals(TestHierarchicalMethodsBase.PRIVATE_RESULT, on(baseClass).call("priv_method", 1).get());
+    }
+
+    @Test
+    public void testExactlyMatchingMethodsArePreferredOverSimilarMethods() throws Exception {
+        TestHierarchicalMethodsSubclass subclass = new TestHierarchicalMethodsSubclass();
+        // we expect the public method gets called when we explicitly call using primitive type
+        assertEquals(TestHierarchicalMethodsBase.PUBLIC_RESULT, on(subclass).callTyped("pub_method", new Class<?>[]{int.class}, 1).get());
+        // but if we call with boxed type, the private method is more specific since it is in the subclass
+        assertEquals(TestHierarchicalMethodsSubclass.PRIVATE_RESULT, on(subclass).callTyped("pub_method", new Class<?>[]{Integer.class}, 1).get());
+    }
+
+    @Test
     public void testMethodsWithAmbiguity() {
         Test3 test;
 
