@@ -188,15 +188,6 @@ public class ReflectTest {
     }
 
     @Test
-    public void testExactlyMatchingMethodsArePreferredOverSimilarMethods() throws Exception {
-        TestHierarchicalMethodsSubclass subclass = new TestHierarchicalMethodsSubclass();
-        // we expect the public method gets called when we explicitly call using primitive type
-        assertEquals(TestHierarchicalMethodsBase.PUBLIC_RESULT, on(subclass).callTyped("pub_method", new Class<?>[]{int.class}, 1).get());
-        // but if we call with boxed type, the private method is more specific since it is in the subclass
-        assertEquals(TestHierarchicalMethodsSubclass.PRIVATE_RESULT, on(subclass).callTyped("pub_method", new Class<?>[]{Integer.class}, 1).get());
-    }
-
-    @Test
     public void testMethodsWithAmbiguity() {
         Test3 test;
 
