@@ -300,7 +300,7 @@ public class Reflect {
      * @see #call(String, Object...)
      */
     public Reflect call(String name) throws ReflectException {
-        return call(name, new Class[0], new Object[0]);
+        return call(name, new Object[0]);
     }
 
     /**
