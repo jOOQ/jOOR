@@ -342,16 +342,6 @@ public class Reflect {
      */
     public Reflect call(String name, Object... args) throws ReflectException {
         Class<?>[] types = types(args);
-        return callTyped(name, types, args);
-    }
-
-    /**
-     * Call a method by its name and explicitly specify the types of the
-     * parameters to compare against.
-     *
-     * @see #call(String, Object...)
-     */
-    private Reflect callTyped(String name, Class<?>[] types, Object... args) throws ReflectException {
 
         // Try invoking the "canonical" method, i.e. the one with exact
         // matching argument types
