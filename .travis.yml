@@ -3,5 +3,5 @@ jdk:
   - oraclejdk7
   - openjdk7
   - openjdk6
-install: sh -c 'cd jOOR/jOOR' && mvn install -DskipTests=true
-script: sh -c 'cd jOOR/jOOR' && mvn test
+install: sh -c 'cd jOOR' && mvn install -DskipTests=true
+script: sh -c 'cd jOOR' && mvn test
