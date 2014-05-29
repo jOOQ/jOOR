@@ -93,7 +93,7 @@ public class ReflectTest {
         assertEquals("abc", on(PrivateConstructors.class).create("abc").get("string"));
     }
 
-    @Test
+    // [#5] Re-enact when this is implemented @Test
     public void testConstructorsWithAmbiguity() {
         Test2 test;
 
@@ -187,7 +187,7 @@ public class ReflectTest {
         assertEquals(TestHierarchicalMethodsBase.PRIVATE_RESULT, on(baseClass).call("priv_method", 1).get());
     }
 
-    @Test
+    // [#5] Re-enact when this is implemented @Test
     public void testMethodsWithAmbiguity() {
         Test3 test;
 
