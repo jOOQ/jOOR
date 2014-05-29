@@ -42,6 +42,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -93,8 +94,11 @@ public class ReflectTest {
         assertEquals("abc", on(PrivateConstructors.class).create("abc").get("string"));
     }
 
-    // [#5] Re-enact when this is implemented @Test
+    @Test
     public void testConstructorsWithAmbiguity() {
+        // [#5] Re-enact when this is implemented
+        assumeTrue(false);
+
         Test2 test;
 
         test = on(Test2.class).create().get();
@@ -187,8 +191,11 @@ public class ReflectTest {
         assertEquals(TestHierarchicalMethodsBase.PRIVATE_RESULT, on(baseClass).call("priv_method", 1).get());
     }
 
-    // [#5] Re-enact when this is implemented @Test
+    @Test
     public void testMethodsWithAmbiguity() {
+        // [#5] Re-enact when this is implemented
+        assumeTrue(false);
+
         Test3 test;
 
         test = on(Test3.class).create().call("method").get();
