@@ -1,16 +1,16 @@
-# Overview
+### Overview
 
 jOOR stands for Java Object Oriented Reflection. It is a simple wrapper for the java.lang.reflect package.
 
 jOOR's name is inspired by jOOQ, a fluent API for SQL building and execution.
 
 
-# Dependencies
+### Dependencies
 
 None!
 
 
-# Simple example
+### Simple example
 
 ````java
 String world = on("java.lang.String")  // Like Class.forName()
@@ -21,7 +21,7 @@ String world = on("java.lang.String")  // Like Class.forName()
 ````
 
 
-# Proxy abstraction
+### Proxy abstraction
 
 jOOR also gives access to the java.lang.reflect.Proxy API in a simple way:
 
@@ -37,7 +37,7 @@ String substring = on("java.lang.String")
 ````
 
 
-# Comparison with standard java.lang.reflect
+### Comparison with standard java.lang.reflect
 
 jOOR code:
 
@@ -77,7 +77,7 @@ catch (Exception ignore) {
 ````
 
 
-# Similar projects
+### Similar projects
 
 Everyday Java reflection with a fluent interface:
 
