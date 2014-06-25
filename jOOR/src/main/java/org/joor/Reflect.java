@@ -558,9 +558,13 @@ public class Reflect {
     private boolean match(Class<?>[] declaredTypes, Class<?>[] actualTypes) {
         if (declaredTypes.length == actualTypes.length) {
             for (int i = 0; i < actualTypes.length; i++) {
-                if (!wrapper(declaredTypes[i]).isAssignableFrom(wrapper(actualTypes[i]))) {
-                    return false;
-                }
+                if (actualTypes[i] == NULL.class)
+                    continue;
+
+                if (wrapper(declaredTypes[i]).isAssignableFrom(wrapper(actualTypes[i])))
+                    continue;
+
+                return false;
             }
 
             return true;
@@ -659,7 +663,7 @@ public class Reflect {
 
         for (int i = 0; i < values.length; i++) {
             Object value = values[i];
-            result[i] = value == null ? Object.class : value.getClass();
+            result[i] = value == null ? NULL.class : value.getClass();
         }
 
         return result;
@@ -733,4 +737,6 @@ public class Reflect {
 
         return type;
     }
+
+    private static class NULL {}
 }
