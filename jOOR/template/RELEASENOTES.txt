@@ -1,6 +1,14 @@
 jOOX Release notes
 ------------------
-For an overview, see also http://code.google.com/p/joor/issues/list
+For an overview, see also
+- (GC) http://code.google.com/p/joor/issues/list
+- (GH) https://github.com/jOOQ/jOOR/issues
+
+Version 0.9.4
+=================================================================
+
+#6 (GH) - Can't pass "null" as a parameter to method call
+#2 (GH) - Add support for calling private methods
 
 Version 0.9.3
 =================================================================
