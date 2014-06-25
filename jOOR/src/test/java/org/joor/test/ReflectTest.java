@@ -171,6 +171,18 @@ public class ReflectTest {
     }
 
     @Test
+    public void testNullArguments() throws Exception {
+        Test9 test9 = new Test9();
+        on(test9).call("put", "key", "value");
+        assertTrue(test9.map.containsKey("key"));
+        assertEquals("value", test9.map.get("key"));
+
+        on(test9).call("put", "key", null);
+        assertTrue(test9.map.containsKey("key"));
+        assertNull(test9.map.get("key"));
+    }
+
+    @Test
     public void testPublicMethodsAreFoundInHierarchy() throws Exception {
         TestHierarchicalMethodsSubclass subclass = new TestHierarchicalMethodsSubclass();
         assertEquals(TestHierarchicalMethodsBase.PUBLIC_RESULT, on(subclass).call("pub_base_method", 1).get());
