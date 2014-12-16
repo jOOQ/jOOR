@@ -35,23 +35,19 @@
  */
 package org.joor.test;
 
-import static junit.framework.Assert.assertTrue;
-import static org.hamcrest.CoreMatchers.is;
-import static org.joor.Reflect.on;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.joor.ReflectException;
 import org.joor.test.Test2.ConstructorType;
 import org.joor.test.Test3.MethodType;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.joor.Reflect.on;
+import static org.junit.Assert.*;
 
 /**
  * @author Lukas Eder
@@ -79,7 +75,6 @@ public class ReflectTest {
         assertEquals("abc", on(String.class).create("abc").get());
         assertEquals("abc", on(String.class).create("abc".getBytes()).get());
         assertEquals("abc", on(String.class).create("abc".toCharArray()).get());
-        assertEquals("b", on(String.class).create("abc".toCharArray(), 1, 1).get());
 
         try {
             on(String.class).create(new Object());
@@ -96,9 +91,6 @@ public class ReflectTest {
 
     @Test
     public void testConstructorsWithAmbiguity() {
-        // [#5] Re-enact when this is implemented
-        assumeTrue(false);
-
         Test2 test;
 
         test = on(Test2.class).create().get();
@@ -205,9 +197,6 @@ public class ReflectTest {
 
     @Test
     public void testMethodsWithAmbiguity() {
-        // [#5] Re-enact when this is implemented
-        assumeTrue(false);
-
         Test3 test;
 
         test = on(Test3.class).create().call("method").get();

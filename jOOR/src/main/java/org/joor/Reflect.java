@@ -35,14 +35,10 @@
  */
 package org.joor;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
+import org.joor.invoke.ConstructorMatcher;
+import org.joor.invoke.MethodMatcher;
+
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -411,20 +407,16 @@ public class Reflect {
 
         // first priority: find a public method with a "similar" signature in class hierarchy
         // similar interpreted in when primitive argument types are converted to their wrappers
-        for (Method method : type.getMethods()) {
-            if (isSimilarSignature(method, name, types)) {
-                return method;
+        try {
+            return new MethodMatcher(type.getMethods()).closest(name, types);
+        } catch (ReflectException ex1) {
+            try {
+                // second priority: find a non-public method with a "similar" signature on declaring class
+                return new MethodMatcher(type.getDeclaredMethods()).closest(name, types);
+            } catch (ReflectException ex2) {
+                throw new NoSuchMethodException("No similar method " + name + " with params " + Arrays.toString(types) + " could be found on type " + type() + ".");
             }
         }
-
-        // second priority: find a non-public method with a "similar" signature on declaring class
-        for (Method method : type.getDeclaredMethods()) {
-            if (isSimilarSignature(method, name, types)) {
-                return method;
-            }
-        }
-
-        throw new NoSuchMethodException("No similar method " + name + " with params " + Arrays.toString(types) + " could be found on type " + type() + ".");
     }
 
     /**
@@ -488,13 +480,7 @@ public class Reflect {
         // If there is no exact match, try to find one that has a "similar"
         // signature if primitive argument types are converted to their wrappers
         catch (NoSuchMethodException e) {
-            for (Constructor<?> constructor : type().getConstructors()) {
-                if (match(constructor.getParameterTypes(), types)) {
-                    return on(constructor, args);
-                }
-            }
-
-            throw new ReflectException(e);
+            return on(new ConstructorMatcher(type().getConstructors()).closest(types), args);
         }
     }
 
@@ -669,7 +655,7 @@ public class Reflect {
      *
      * @see Object#getClass()
      */
-    private static Class<?>[] types(Object... values) {
+    public static Class<?>[] types(Object... values) {
         if (values == null) {
             return new Class[0];
         }
@@ -753,5 +739,5 @@ public class Reflect {
         return type;
     }
 
-    private static class NULL {}
+    public static class NULL {}
 }
