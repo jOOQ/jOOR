@@ -14,7 +14,7 @@ None!
 
 ````java
 // All examples assume the following static import:
-import static org.joor.Reflect;
+import static org.joor.Reflect.*;
 
 String world = on("java.lang.String")  // Like Class.forName()
                 .create("Hello World") // Call most specific matching constructor
