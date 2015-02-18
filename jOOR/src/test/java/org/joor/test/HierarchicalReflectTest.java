@@ -62,14 +62,12 @@ public class HierarchicalReflectTest {
     }
 
     @Test
-    @Ignore
     public void testPrivateMembersAreFoundInHierarchy() throws Exception {
         obj = new HierarchicalSubclass();
         checkMembers(HierarchicalBase.PRIVATE_RESULT, "very_priv");
     }
 
     @Test
-    @Ignore
     public void testPrivateMembersAreFoundOnDeclaringClass() throws Exception {
         obj = new HierarchicalSubclass();
         checkMembers(HierarchicalSubclass.PRIVATE_RESULT, "priv");
@@ -79,7 +77,6 @@ public class HierarchicalReflectTest {
     }
 
     @Test
-    @Ignore
     public void testSetsVeryPrivateFields() throws Exception {
         obj = new HierarchicalSubclass();
         String privateResult2 = HierarchicalBase.PRIVATE_RESULT + 2;

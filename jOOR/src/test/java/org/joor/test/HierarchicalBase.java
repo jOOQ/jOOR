@@ -36,7 +36,6 @@
 package org.joor.test;
 
 public class HierarchicalBase {
-
     public static String PUBLIC_RESULT = "PUBLIC_BASE";
     public static String PRIVATE_RESULT = "PRIVATE_BASE";
 
@@ -50,12 +49,11 @@ public class HierarchicalBase {
     public String pub_method(int number) {
         return PUBLIC_RESULT;
     }
-
     private String priv_method(int number) {
         return PRIVATE_RESULT;
     }
 
-    private String very_priv_method() {
+    private String very_priv_method(int number) {
         return PRIVATE_RESULT;
     }
 }

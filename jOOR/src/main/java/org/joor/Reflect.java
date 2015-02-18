@@ -43,9 +43,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A wrapper for an {@link Object} or {@link Class} upon which reflective calls
@@ -203,22 +201,28 @@ public class Reflect {
      */
     public Reflect set(String name, Object value) throws ReflectException {
         try {
-
-            // Try setting a public field
-            Field field = type().getField(name);
-            field.set(object, unwrap(value));
+            findAccessibleField(name).set(object, unwrap(value));
             return this;
+        } catch (Exception e) {
+            throw new ReflectException(e);
         }
-        catch (Exception e1) {
+    }
 
-            // Try again, setting a non-public field
-            try {
-                accessible(type().getDeclaredField(name)).set(object, unwrap(value));
-                return this;
-            }
-            catch (Exception e2) {
-                throw new ReflectException(e2);
-            }
+    private Field findAccessibleField(String name) {
+        Class<?> type = type();
+        try {
+            // 1: try public fields in class and superclasses
+            return type.getField(name);
+        } catch (NoSuchFieldException e1) {
+            // 2: try other fields in class and superclasses
+            do {
+                try {
+                    return accessible(type.getDeclaredField(name));
+                } catch (NoSuchFieldException e2) {
+                    type = type.getSuperclass();
+                }
+            } while(type != null);
+            throw new ReflectException(e1);
         }
     }
 
@@ -256,20 +260,10 @@ public class Reflect {
      */
     public Reflect field(String name) throws ReflectException {
         try {
-
-             // Try getting a public field
-            Field field = type().getField(name);
+            Field field = findAccessibleField(name);
             return on(field.get(object));
-        }
-        catch (Exception e1) {
-
-            // Try again, getting a non-public field
-            try {
-                return on(accessible(type().getDeclaredField(name)).get(object));
-            }
-            catch (Exception e2) {
-                throw new ReflectException(e2);
-            }
+        } catch (Exception e) {
+            throw new ReflectException(e);
         }
     }
 
@@ -291,13 +285,23 @@ public class Reflect {
     public Map<String, Reflect> fields() {
         Map<String, Reflect> result = new LinkedHashMap<String, Reflect>();
 
-        for (Field field : type().getFields()) {
+        for (Field field : findFields()) {
             if (!isClass ^ Modifier.isStatic(field.getModifiers())) {
                 String name = field.getName();
                 result.put(name, field(name));
             }
         }
 
+        return result;
+    }
+
+    private List<Field> findFields() {
+        Class<?> type = type();
+        List<Field> result = new ArrayList<Field>();;
+        do {
+            Collections.addAll(result, type.getDeclaredFields());
+            type = type.getSuperclass();
+        } while(type != null);
         return result;
     }
 
@@ -384,17 +388,25 @@ public class Reflect {
      * Otherwise a private method with the exact same signature is returned.
      * If no exact match could be found, we let the {@code NoSuchMethodException} pass through.
      */
-    private Method exactMethod(String name, Class<?>[] types) throws NoSuchMethodException {
-        final Class<?> type = type();
+    private Method exactMethod(String name, Class<?>[] argumentTypes) throws NoSuchMethodException {
+        return findMethod(name, argumentTypes);
+    }
 
-        // first priority: find a public method with exact signature match in class hierarchy
+    private Method findMethod(String name, Class<?>[] argumentTypes) throws NoSuchMethodException {
+        Class<?> type = type();
         try {
-            return type.getMethod(name, types);
-        }
-
-        // second priority: find a private method with exact signature match on declaring class
-        catch (NoSuchMethodException e) {
-            return type.getDeclaredMethod(name, types);
+            // 1: try public methods in class and superclasses
+            return type.getMethod(name, argumentTypes);
+        } catch (NoSuchMethodException e1) {
+            // 2: try other methods in class and superclasses
+            do {
+                try {
+                    return type.getDeclaredMethod(name, argumentTypes);
+                } catch (NoSuchMethodException e2) {
+                    type = type.getSuperclass();
+                }
+            } while(type != null);
+            throw e1;
         }
     }
 
@@ -407,24 +419,31 @@ public class Reflect {
      * returned, otherwise a {@code NoSuchMethodException} is thrown.
      */
     private Method similarMethod(String name, Class<?>[] types) throws NoSuchMethodException {
-        final Class<?> type = type();
-
-        // first priority: find a public method with a "similar" signature in class hierarchy
-        // similar interpreted in when primitive argument types are converted to their wrappers
-        for (Method method : type.getMethods()) {
+        // 1: try public methods in class and superclasses
+        for (Method method : type().getMethods()) {
             if (isSimilarSignature(method, name, types)) {
                 return method;
             }
         }
 
-        // second priority: find a non-public method with a "similar" signature on declaring class
-        for (Method method : type.getDeclaredMethods()) {
+        // 1: try other methods in class and superclasses
+        for (Method method : findMethods()) {
             if (isSimilarSignature(method, name, types)) {
                 return method;
             }
         }
 
         throw new NoSuchMethodException("No similar method " + name + " with params " + Arrays.toString(types) + " could be found on type " + type() + ".");
+    }
+
+    private List<Method> findMethods() {
+        Class<?> type = type();
+        List<Method> result = new ArrayList<Method>();
+        do {
+            Collections.addAll(result, type.getDeclaredMethods());
+            type = type.getSuperclass();
+        } while(type != null);
+        return result;
     }
 
     /**

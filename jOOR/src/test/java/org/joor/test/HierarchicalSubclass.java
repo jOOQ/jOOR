@@ -36,7 +36,6 @@
 package org.joor.test;
 
 public class HierarchicalSubclass extends HierarchicalBase {
-
     public static String PUBLIC_RESULT = "PUBLIC_SUB";
     public static String PRIVATE_RESULT = "PRIVATE_SUB";
 
