@@ -488,7 +488,7 @@ public class Reflect {
         // If there is no exact match, try to find one that has a "similar"
         // signature if primitive argument types are converted to their wrappers
         catch (NoSuchMethodException e) {
-            for (Constructor<?> constructor : type().getConstructors()) {
+            for (Constructor<?> constructor : type().getDeclaredConstructors()) {
                 if (match(constructor.getParameterTypes(), types)) {
                     return on(constructor, args);
                 }

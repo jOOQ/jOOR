@@ -390,6 +390,21 @@ public class ReflectTest {
         // assertEquals(Test2.ConstructorType.OBJECT, test2.constructorType);
     }
 
+    @Test
+    public void testCreateWithPrivateConstructor() throws Exception {
+        Test10 t1 = on(Test10.class).create(1).get();
+        assertEquals(1, (int) t1.i);
+        assertNull(t1.s);
+
+        Test10 t2 = on(Test10.class).create("a").get();
+        assertNull(t2.i);
+        assertEquals("a", t2.s);
+
+        Test10 t3 = on(Test10.class).create("a", 1).get();
+        assertEquals(1, (int) t3.i);
+        assertEquals("a", t3.s);
+    }
+
     @Before
     public void setUp() {
         Test1.S_INT1 = 0;
