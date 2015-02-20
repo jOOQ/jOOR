@@ -62,6 +62,7 @@ import java.util.*;
  * // Retrieve the wrapped object
  *
  * @author Lukas Eder
+ * @author Irek Matysiewicz <iirekm@gmail.com>
  */
 public class Reflect {
 

@@ -41,6 +41,9 @@ import org.junit.Test;
 import static org.joor.Reflect.on;
 import static org.junit.Assert.assertEquals;
 
+/**
+ * @author Irek Matysiewicz <iirekm@gmail.com>
+ */
 public class HierarchicalReflectTest {
     private Object obj;
 
