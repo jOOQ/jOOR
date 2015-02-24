@@ -35,20 +35,23 @@
  */
 package org.joor.test;
 
+import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.joor.Reflect.on;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.joor.ReflectException;
 import org.joor.test.Test2.ConstructorType;
 import org.joor.test.Test3.MethodType;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static junit.framework.Assert.assertTrue;
-import static org.hamcrest.CoreMatchers.is;
-import static org.joor.Reflect.on;
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeTrue;
 
 /**
  * @author Lukas Eder
@@ -177,6 +180,27 @@ public class ReflectTest {
         on(test9).call("put", "key", null);
         assertTrue(test9.map.containsKey("key"));
         assertNull(test9.map.get("key"));
+    }
+
+    @Test
+    public void testPublicMethodsAreFoundInHierarchy() throws Exception {
+        TestHierarchicalMethodsSubclass subclass = new TestHierarchicalMethodsSubclass();
+        assertEquals(TestHierarchicalMethodsBase.PUBLIC_RESULT, on(subclass).call("pub_base_method", 1).get());
+    }
+
+    @Test(expected = ReflectException.class)
+    public void testPrivateMethodsAreNotFoundInHierarchy() throws Exception {
+        TestHierarchicalMethodsSubclass subclass = new TestHierarchicalMethodsSubclass();
+        on(subclass).call("very_priv_method").get();
+    }
+
+    @Test
+    public void testPrivateMethodsAreFoundOnDeclaringClass() throws Exception {
+        TestHierarchicalMethodsSubclass subclass = new TestHierarchicalMethodsSubclass();
+        assertEquals(TestHierarchicalMethodsSubclass.PRIVATE_RESULT, on(subclass).call("priv_method", 1).get());
+
+        TestHierarchicalMethodsBase baseClass = new TestHierarchicalMethodsBase();
+        assertEquals(TestHierarchicalMethodsBase.PRIVATE_RESULT, on(baseClass).call("priv_method", 1).get());
     }
 
     @Test
