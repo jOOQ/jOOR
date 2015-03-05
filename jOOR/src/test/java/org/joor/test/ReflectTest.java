@@ -307,6 +307,17 @@ public class ReflectTest {
         assertEquals(1, on(Test1.class).fields().get("S_INT2").get());
         assertNull(on(Test1.class).set("S_INT2", null).fields().get("S_INT2").get());
         assertNull(on(Test1.class).fields().get("S_INT2").get());
+
+        // Hierarchies
+        // -----------
+        TestHierarchicalMethodsSubclass test2 = new TestHierarchicalMethodsSubclass();
+        assertEquals(6, on(test2).fields().size());
+        assertTrue(on(test2).fields().containsKey("invisibleField1"));
+        assertTrue(on(test2).fields().containsKey("invisibleField2"));
+        assertTrue(on(test2).fields().containsKey("invisibleField3"));
+        assertTrue(on(test2).fields().containsKey("visibleField1"));
+        assertTrue(on(test2).fields().containsKey("visibleField2"));
+        assertTrue(on(test2).fields().containsKey("visibleField3"));
     }
 
     @Test

@@ -296,13 +296,21 @@ public class Reflect {
      */
     public Map<String, Reflect> fields() {
         Map<String, Reflect> result = new LinkedHashMap<String, Reflect>();
+        Class<?> type = type();
 
-        for (Field field : type().getFields()) {
-            if (!isClass ^ Modifier.isStatic(field.getModifiers())) {
-                String name = field.getName();
-                result.put(name, field(name));
+        do {
+            for (Field field : type.getDeclaredFields()) {
+                if (!isClass ^ Modifier.isStatic(field.getModifiers())) {
+                    String name = field.getName();
+
+                    if (!result.containsKey(name))
+                        result.put(name, field(name));
+                }
             }
+
+            type = type.getSuperclass();
         }
+        while (type != null);
 
         return result;
     }
