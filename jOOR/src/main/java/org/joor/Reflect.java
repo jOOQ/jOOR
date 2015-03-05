@@ -264,18 +264,18 @@ public class Reflect {
         }
 
         // Try again, getting a non-public field
-        catch (Exception e1) {
+        catch (NoSuchFieldException e) {
             do {
                 try {
                     return accessible(type.getDeclaredField(name));
                 }
-                catch (Exception e2) {
-                    type = type.getSuperclass();
-                }
+                catch (NoSuchFieldException ignore) {}
+
+                type = type.getSuperclass();
             }
             while (type != null);
 
-            throw new ReflectException(e1);
+            throw new ReflectException(e);
         }
     }
 
@@ -296,13 +296,21 @@ public class Reflect {
      */
     public Map<String, Reflect> fields() {
         Map<String, Reflect> result = new LinkedHashMap<String, Reflect>();
+        Class<?> type = type();
 
-        for (Field field : type().getFields()) {
-            if (!isClass ^ Modifier.isStatic(field.getModifiers())) {
-                String name = field.getName();
-                result.put(name, field(name));
+        do {
+            for (Field field : type.getDeclaredFields()) {
+                if (!isClass ^ Modifier.isStatic(field.getModifiers())) {
+                    String name = field.getName();
+
+                    if (!result.containsKey(name))
+                        result.put(name, field(name));
+                }
             }
+
+            type = type.getSuperclass();
         }
+        while (type != null);
 
         return result;
     }
@@ -391,7 +399,7 @@ public class Reflect {
      * If no exact match could be found, we let the {@code NoSuchMethodException} pass through.
      */
     private Method exactMethod(String name, Class<?>[] types) throws NoSuchMethodException {
-        final Class<?> type = type();
+        Class<?> type = type();
 
         // first priority: find a public method with exact signature match in class hierarchy
         try {
@@ -400,7 +408,17 @@ public class Reflect {
 
         // second priority: find a private method with exact signature match on declaring class
         catch (NoSuchMethodException e) {
-            return type.getDeclaredMethod(name, types);
+            do {
+                try {
+                    return type.getDeclaredMethod(name, types);
+                }
+                catch (NoSuchMethodException ignore) {}
+
+                type = type.getSuperclass();
+            }
+            while (type != null);
+
+            throw new NoSuchMethodException();
         }
     }
 
@@ -413,7 +431,7 @@ public class Reflect {
      * returned, otherwise a {@code NoSuchMethodException} is thrown.
      */
     private Method similarMethod(String name, Class<?>[] types) throws NoSuchMethodException {
-        final Class<?> type = type();
+        Class<?> type = type();
 
         // first priority: find a public method with a "similar" signature in class hierarchy
         // similar interpreted in when primitive argument types are converted to their wrappers
@@ -424,11 +442,16 @@ public class Reflect {
         }
 
         // second priority: find a non-public method with a "similar" signature on declaring class
-        for (Method method : type.getDeclaredMethods()) {
-            if (isSimilarSignature(method, name, types)) {
-                return method;
+        do {
+            for (Method method : type.getDeclaredMethods()) {
+                if (isSimilarSignature(method, name, types)) {
+                    return method;
+                }
             }
+
+            type = type.getSuperclass();
         }
+        while (type != null);
 
         throw new NoSuchMethodException("No similar method " + name + " with params " + Arrays.toString(types) + " could be found on type " + type() + ".");
     }
