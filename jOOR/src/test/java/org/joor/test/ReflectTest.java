@@ -37,6 +37,7 @@ package org.joor.test;
 
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
+import static org.joor.Reflect.accessible;
 import static org.joor.Reflect.on;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -232,7 +233,7 @@ public class ReflectTest {
     }
 
     @Test
-    public void testFields() {
+    public void testFields() throws Exception {
         // Instance methods
         // ----------------
         Test1 test1 = new Test1();
@@ -251,6 +252,29 @@ public class ReflectTest {
         assertEquals(1, on(Test1.class).field("S_INT2").get());
         assertNull(on(Test1.class).set("S_INT2", null).get("S_INT2"));
         assertNull(on(Test1.class).field("S_INT2").get());
+
+        // Hierarchies
+        // -----------
+        TestHierarchicalMethodsSubclass test2 = new TestHierarchicalMethodsSubclass();
+        assertEquals(1, on(test2).set("invisibleField1", 1).get("invisibleField1"));
+        assertEquals(1, accessible(TestHierarchicalMethodsBase.class.getDeclaredField("invisibleField1")).get(test2));
+
+        assertEquals(1, on(test2).set("invisibleField2", 1).get("invisibleField2"));
+        assertEquals(0, accessible(TestHierarchicalMethodsBase.class.getDeclaredField("invisibleField2")).get(test2));
+        assertEquals(1, accessible(TestHierarchicalMethodsSubclass.class.getDeclaredField("invisibleField2")).get(test2));
+
+        assertEquals(1, on(test2).set("invisibleField3", 1).get("invisibleField3"));
+        assertEquals(1, accessible(TestHierarchicalMethodsSubclass.class.getDeclaredField("invisibleField3")).get(test2));
+
+        assertEquals(1, on(test2).set("visibleField1", 1).get("visibleField1"));
+        assertEquals(1, accessible(TestHierarchicalMethodsBase.class.getDeclaredField("visibleField1")).get(test2));
+
+        assertEquals(1, on(test2).set("visibleField2", 1).get("visibleField2"));
+        assertEquals(0, accessible(TestHierarchicalMethodsBase.class.getDeclaredField("visibleField2")).get(test2));
+        assertEquals(1, accessible(TestHierarchicalMethodsSubclass.class.getDeclaredField("visibleField2")).get(test2));
+
+        assertEquals(1, on(test2).set("visibleField3", 1).get("visibleField3"));
+        assertEquals(1, accessible(TestHierarchicalMethodsSubclass.class.getDeclaredField("visibleField3")).get(test2));
     }
 
     @Test

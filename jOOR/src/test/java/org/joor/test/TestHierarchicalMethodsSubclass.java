@@ -40,7 +40,12 @@ public class TestHierarchicalMethodsSubclass extends TestHierarchicalMethodsBase
     public static String PUBLIC_RESULT = "PUBLIC_SUB";
     public static String PRIVATE_RESULT = "PRIVATE_SUB";
 
+    // Both of these are hiding fields in the super type
+    private int invisibleField2;
+    public int visibleField2;
 
+    private int invisibleField3;
+    public int visibleField3;
 
     private String priv_method(int number) {
         return PRIVATE_RESULT;

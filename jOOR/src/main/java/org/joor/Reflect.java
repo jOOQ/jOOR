@@ -64,6 +64,7 @@ import java.util.Map;
  * // Retrieve the wrapped object
  *
  * @author Lukas Eder
+ * @author Irek Matysiewicz
  */
 public class Reflect {
 
@@ -203,22 +204,12 @@ public class Reflect {
      */
     public Reflect set(String name, Object value) throws ReflectException {
         try {
-
-            // Try setting a public field
-            Field field = type().getField(name);
+            Field field = field0(name);
             field.set(object, unwrap(value));
             return this;
         }
-        catch (Exception e1) {
-
-            // Try again, setting a non-public field
-            try {
-                accessible(type().getDeclaredField(name)).set(object, unwrap(value));
-                return this;
-            }
-            catch (Exception e2) {
-                throw new ReflectException(e2);
-            }
+        catch (Exception e) {
+            throw new ReflectException(e);
         }
     }
 
@@ -256,20 +247,35 @@ public class Reflect {
      */
     public Reflect field(String name) throws ReflectException {
         try {
-
-             // Try getting a public field
-            Field field = type().getField(name);
+            Field field = field0(name);
             return on(field.get(object));
         }
-        catch (Exception e1) {
+        catch (Exception e) {
+            throw new ReflectException(e);
+        }
+    }
 
-            // Try again, getting a non-public field
-            try {
-                return on(accessible(type().getDeclaredField(name)).get(object));
+    private Field field0(String name) throws ReflectException {
+        Class<?> type = type();
+
+        // Try getting a public field
+        try {
+            return type.getField(name);
+        }
+
+        // Try again, getting a non-public field
+        catch (Exception e1) {
+            do {
+                try {
+                    return accessible(type.getDeclaredField(name));
+                }
+                catch (Exception e2) {
+                    type = type.getSuperclass();
+                }
             }
-            catch (Exception e2) {
-                throw new ReflectException(e2);
-            }
+            while (type != null);
+
+            throw new ReflectException(e1);
         }
     }
 
