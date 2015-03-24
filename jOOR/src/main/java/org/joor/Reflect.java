@@ -86,6 +86,10 @@ public class Reflect {
         return on(forName(name));
     }
 
+    public static Reflect on(String name, ClassLoader classLoader) throws ReflectException {
+        return on(forName(name, classLoader));
+    }
+
     /**
      * Wrap a class.
      * <p>
@@ -721,6 +725,15 @@ public class Reflect {
     private static Class<?> forName(String name) throws ReflectException {
         try {
             return Class.forName(name);
+        }
+        catch (Exception e) {
+            throw new ReflectException(e);
+        }
+    }
+
+    private static Class<?> forName(String name, ClassLoader classLoader) throws ReflectException {
+        try {
+            return Class.forName(name, true, classLoader);
         }
         catch (Exception e) {
             throw new ReflectException(e);
