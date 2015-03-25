@@ -86,6 +86,19 @@ public class Reflect {
         return on(forName(name));
     }
 
+    /**
+     * Wrap a class name, loading it via a given class loader.
+     * <p>
+     * This is the same as calling
+     * <code>on(Class.forName(name, classLoader))</code>
+     *
+     * @param name A fully qualified class name.
+     * @param classLoader The class loader in whose context the class should be
+     *            loaded.
+     * @return A wrapped class object, to be used for further reflection.
+     * @throws ReflectException If any reflection exception occurred.
+     * @see #on(Class)
+     */
     public static Reflect on(String name, ClassLoader classLoader) throws ReflectException {
         return on(forName(name, classLoader));
     }
