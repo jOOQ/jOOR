@@ -4,7 +4,7 @@ jOOR stands for Java Object Oriented Reflection. It is a simple wrapper for the 
 
 jOOR's name is inspired by jOOQ, a fluent API for SQL building and execution.
 
-### ![中文说明](https://github.com/tianzhijiexian/jOOR/blob/master/README%20-%20chinese.md)
+### [中文说明](https://github.com/tianzhijiexian/jOOR/blob/master/README%20-%20chinese.md)
 
 ### Dependencies
 
