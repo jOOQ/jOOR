@@ -12,7 +12,7 @@
     <groupId>org.jooq</groupId>
     <artifactId>joor</artifactId>
     <version>0.9.6</version>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
 
     <name>jOOR</name>
     <description>jOOR stands for Java Object Oriented Reflection. It is a simple wrapper for the java.lang.reflect package.</description>
