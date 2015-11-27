@@ -35,24 +35,26 @@
  */
 package org.joor.test;
 
-import static junit.framework.Assert.assertTrue;
-import static org.hamcrest.CoreMatchers.is;
-import static org.joor.Reflect.accessible;
-import static org.joor.Reflect.on;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
-
-import java.util.HashMap;
-import java.util.Map;
-
+import org.joor.Reflect;
 import org.joor.ReflectException;
 import org.joor.test.Test2.ConstructorType;
 import org.joor.test.Test3.MethodType;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.joor.Reflect.accessible;
+import static org.joor.Reflect.on;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * @author Lukas Eder
@@ -61,6 +63,7 @@ public class ReflectTest {
 
     @Test
     public void testOn() {
+        assertEquals(on(Object.class), on("java.lang.Object", ClassLoader.getSystemClassLoader()));
         assertEquals(on(Object.class), on("java.lang.Object"));
         assertEquals(on(Object.class).get(), on("java.lang.Object").get());
         assertEquals(Object.class, on(Object.class).get());
@@ -71,7 +74,13 @@ public class ReflectTest {
             on("asdf");
             fail();
         }
-        catch (ReflectException expected) {}
+        catch (ReflectException ignored) {}
+
+        try {
+            on("asdf", ClassLoader.getSystemClassLoader());
+            fail();
+        }
+        catch (ReflectException ignored) {}
     }
 
     @Test
@@ -86,7 +95,7 @@ public class ReflectTest {
             on(String.class).create(new Object());
             fail();
         }
-        catch (ReflectException expected) {}
+        catch (ReflectException ignored) {}
     }
 
     @Test
@@ -275,6 +284,8 @@ public class ReflectTest {
 
         assertEquals(1, on(test2).set("visibleField3", 1).get("visibleField3"));
         assertEquals(1, accessible(TestHierarchicalMethodsSubclass.class.getDeclaredField("visibleField3")).get(test2));
+
+        assertNull(accessible(null));
     }
 
     @Test
@@ -390,7 +401,7 @@ public class ReflectTest {
             on(map).as(Test6.class).testIgnore();
             fail();
         }
-        catch (ReflectException expected) {}
+        catch (ReflectException ignored) {}
     }
 
     @Test
@@ -438,6 +449,38 @@ public class ReflectTest {
         Test10 t3 = on(Test10.class).create("a", 1).get();
         assertEquals(1, (int) t3.i);
         assertEquals("a", t3.s);
+    }
+
+    @Test
+    public void testHashCode() {
+        Object object = new Object();
+        assertEquals(Reflect.on(object).hashCode(), object.hashCode());
+    }
+
+    @Test
+    public void testToString() {
+        Object object = new Object() {
+            @Override
+            public String toString() {
+                return "test";
+            }
+        };
+        assertEquals(Reflect.on(object).toString(), object.toString());
+    }
+
+    @Test
+    public void testEquals() {
+        Object object = new Object();
+        Reflect a = Reflect.on(object);
+        Reflect b = Reflect.on(object);
+        Reflect c = Reflect.on(object);
+
+        assertTrue(b.equals(a));
+        assertTrue(a.equals(b));
+        assertTrue(b.equals(c));
+        assertTrue(a.equals(c));
+        //noinspection ObjectEqualsNull
+        assertFalse(a.equals(null));
     }
 
     @Before
