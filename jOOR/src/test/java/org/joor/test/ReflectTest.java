@@ -35,16 +35,6 @@
  */
 package org.joor.test;
 
-import org.joor.Reflect;
-import org.joor.ReflectException;
-import org.joor.test.Test2.ConstructorType;
-import org.joor.test.Test3.MethodType;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.joor.Reflect.accessible;
@@ -55,6 +45,16 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.joor.Reflect;
+import org.joor.ReflectException;
+import org.joor.test.Test2.ConstructorType;
+import org.joor.test.Test3.MethodType;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Lukas Eder
@@ -74,13 +74,13 @@ public class ReflectTest {
             on("asdf");
             fail();
         }
-        catch (ReflectException ignored) {}
+        catch (ReflectException expected) {}
 
         try {
             on("asdf", ClassLoader.getSystemClassLoader());
             fail();
         }
-        catch (ReflectException ignored) {}
+        catch (ReflectException expected) {}
     }
 
     @Test
@@ -95,7 +95,7 @@ public class ReflectTest {
             on(String.class).create(new Object());
             fail();
         }
-        catch (ReflectException ignored) {}
+        catch (ReflectException expected) {}
     }
 
     @Test
@@ -401,7 +401,7 @@ public class ReflectTest {
             on(map).as(Test6.class).testIgnore();
             fail();
         }
-        catch (ReflectException ignored) {}
+        catch (ReflectException expected) {}
     }
 
     @Test
