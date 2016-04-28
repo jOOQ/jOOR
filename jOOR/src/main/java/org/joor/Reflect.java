@@ -277,7 +277,7 @@ public class Reflect {
 
         // Try getting a public field
         try {
-            return type.getField(name);
+            return accessible(type.getField(name));
         }
 
         // Try again, getting a non-public field
