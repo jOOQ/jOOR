@@ -267,6 +267,47 @@ public class ReflectTest {
 
         assertNull(accessible(null));
     }
+    
+    @Test
+    public void testFinalFields(){
+        // Instance methods
+        // ----------------
+        Test11 test11 = new Test11();
+        assertEquals(1, on(test11).setFinal("F_INT1", 1).get("F_INT1"));
+        assertEquals(1, on(test11).field("F_INT1").get());
+        assertEquals(1, on(test11).setFinal("F_INT2", 1).get("F_INT1"));
+        assertEquals(1, on(test11).field("F_INT2").get());
+        assertNull(on(test11).setFinal("F_INT2", null).get("F_INT2"));
+        assertNull(on(test11).field("F_INT2").get());
+
+        // Static methods
+        // ----------------
+        assertEquals(1, on(Test11.class).setFinal("SF_INT1", 1).get("SF_INT1"));
+        assertEquals(1, on(Test11.class).field("SF_INT1").get());
+        assertEquals(1, on(Test11.class).setFinal("SF_INT2", 1).get("SF_INT2"));
+        assertEquals(1, on(Test11.class).field("SF_INT2").get());
+        on(Test11.class).setFinal("SF_INT2", 1).field("SF_INT2").get();;
+        assertNull(on(Test11.class).setFinal("SF_INT2", null).get("SF_INT2"));
+        assertNull(on(Test11.class).field("SF_INT2").get());
+    }
+
+    @Test
+    public void testFinalFieldAdvanced() {
+        on(Test11.class).set("S_DATA", on(Test11.class).create())
+                .field("S_DATA")
+                .set("I_DATA", on(Test11.class).create())
+                .field("I_DATA")
+                .setFinal("F_INT1", 1)
+                .setFinal("F_INT2", 1)
+                .setFinal("SF_INT1", 2)
+                .setFinal("SF_INT2", 2);
+        assertEquals(2, Test11.SF_INT1);
+        assertEquals(new Integer(2), Test11.SF_INT2);
+        assertEquals(0, Test11.S_DATA.F_INT1);
+        assertEquals(new Integer(0), Test11.S_DATA.F_INT2);
+        assertEquals(1, Test11.S_DATA.I_DATA.F_INT1);
+        assertEquals(new Integer(1), Test11.S_DATA.I_DATA.F_INT2);
+    }
 
     @Test
     public void testFieldMap() {
