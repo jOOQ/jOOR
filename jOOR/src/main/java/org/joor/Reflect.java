@@ -211,6 +211,34 @@ public class Reflect {
     }
 
     /**
+     * Set a final field value.
+     * <p>
+     * Version of {@link Field#set(Object, Object)} only for changing final variables. If the
+     * wrapped object is a {@link Class}, then this will set a value to a static
+     * member field. If the wrapped object is any other {@link Object}, then
+     * this will set a value to an instance member field.
+     * For restrictions of usage check: http://bit.ly/changing_final_fields_java
+     *
+     * @param name The final field name
+     * @param value The new field value
+     * @return The same wrapped object, to be used for further reflection.
+     * @throws ReflectException if any reflection exception occurred.
+     */
+    public Reflect setFinal(String name, Object value) throws ReflectException {
+        try {
+            Field field = field0(name);
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(object, unwrap(value));
+            return this;
+        }
+        catch (Exception e) {
+            throw new ReflectException(e);
+        }
+    }
+    
+    /**
      * Get a field value.
      * <p>
      * This is roughly equivalent to {@link Field#get(Object)}. If the wrapped
