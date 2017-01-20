@@ -193,7 +193,7 @@ public class Reflect {
      * wrapped object is a {@link Class}, then this will set a value to a static
      * member field. If the wrapped object is any other {@link Object}, then
      * this will set a value to an instance member field.
-     * For restrictions of usage check regarding setting values on final fields check:
+     * For restrictions of usage regarding setting values on final fields check:
      * http://stackoverflow.com/questions/3301635/change-private-static-final-field-using-java-reflection
      * @param name The field name
      * @param value The new field value
@@ -203,7 +203,7 @@ public class Reflect {
     public Reflect set(String name, Object value) throws ReflectException {
         try {
             Field field = field0(name);
-            if (Modifier.isFinal(field.getModifiers())) {
+            if ((field.getModifiers() & Modifier.FINAL) == Modifier.FINAL) {
                 Field modifiersField = Field.class.getDeclaredField("modifiers");
                 modifiersField.setAccessible(true);
                 modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
