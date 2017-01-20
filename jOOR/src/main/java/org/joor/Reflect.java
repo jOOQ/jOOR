@@ -217,7 +217,8 @@ public class Reflect {
      * wrapped object is a {@link Class}, then this will set a value to a static
      * member field. If the wrapped object is any other {@link Object}, then
      * this will set a value to an instance member field.
-     * For restrictions of usage check: http://bit.ly/changing_final_fields_java
+     * For restrictions of usage check: 
+     * http://stackoverflow.com/questions/3301635/change-private-static-final-field-using-java-reflection
      *
      * @param name The final field name
      * @param value The new field value
