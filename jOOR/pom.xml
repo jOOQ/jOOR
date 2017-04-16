@@ -15,7 +15,7 @@
     <packaging>bundle</packaging>
 
     <name>jOOR</name>
-    <description>jOOR stands for Java Object Oriented Reflection. It is a simple wrapper for the java.lang.reflect package.</description>
+    <description>jOOR is a recursive acronym that stands for jOOR Object Oriented Reflection. It is a simple wrapper for the java.lang.reflect package.</description>
     <url>https://github.com/jOOQ/jOOR</url>
 
     <licenses>
