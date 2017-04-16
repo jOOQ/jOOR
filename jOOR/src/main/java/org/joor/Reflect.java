@@ -191,8 +191,21 @@ public class Reflect {
      * wrapped object is a {@link Class}, then this will set a value to a static
      * member field. If the wrapped object is any other {@link Object}, then
      * this will set a value to an instance member field.
+     * <p>
+     * This method is also capable of setting the value of (static) final
+     * fields. This may be convenient in situations where no
+     * {@link SecurityManager} is expected to prevent this, but do note that
+     * (especially static) final fields may already have been inlined by the
+     * javac and/or JIT and relevant code deleted from the runtime verison of
+     * your program, so setting these fields might not have any effect on your
+     * execution.
+     * <p>
      * For restrictions of usage regarding setting values on final fields check:
-     * http://stackoverflow.com/questions/3301635/change-private-static-final-field-using-java-reflection
+     * <a href=
+     * "http://stackoverflow.com/questions/3301635/change-private-static-final-field-using-java-reflection">http://stackoverflow.com/questions/3301635/change-private-static-final-field-using-java-reflection</a>
+     * ... and <a href=
+     * "http://pveentjer.blogspot.co.at/2017/01/final-static-boolean-jit.html">http://pveentjer.blogspot.co.at/2017/01/final-static-boolean-jit.html</a>
+     *
      * @param name The field name
      * @param value The new field value
      * @return The same wrapped object, to be used for further reflection.
@@ -213,7 +226,7 @@ public class Reflect {
             throw new ReflectException(e);
         }
     }
-    
+
     /**
      * Get a field value.
      * <p>
