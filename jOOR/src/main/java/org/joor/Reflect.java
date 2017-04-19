@@ -13,6 +13,7 @@
  */
 package org.joor;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -43,6 +44,7 @@ import java.util.Map;
  *
  * @author Lukas Eder
  * @author Irek Matysiewicz
+ * @author Thomas Darimont
  */
 public class Reflect {
 
@@ -549,7 +551,7 @@ public class Reflect {
      * @return A proxy for the wrapped object
      */
     @SuppressWarnings("unchecked")
-    public <P> P as(Class<P> proxyType) {
+    public <P> P as(final Class<P> proxyType) {
         final boolean isMap = (object instanceof Map);
         final InvocationHandler handler = new InvocationHandler() {
             @SuppressWarnings("null")
@@ -578,6 +580,10 @@ public class Reflect {
                             map.put(property(name.substring(3)), args[0]);
                             return null;
                         }
+                    }
+
+                    if (JavaSupport.DefaultMethodSupport.isDefaultMethod(method)) {
+                        return JavaSupport.DefaultMethodSupport.invokeDefaultMethod(proxy, proxyType, method, args);
                     }
 
                     throw e;
@@ -806,4 +812,69 @@ public class Reflect {
     }
 
     private static class NULL {}
+
+    static class JavaSupport {
+
+        static final boolean JAVA_7_OR_HIGHER = isJava7orHigher();
+
+        static final boolean JAVA_8_OR_HIGHER = isJava8orHigher();
+
+        private static boolean isJava7orHigher(){
+            try {
+                Class.forName("java.util.Objects");
+                return true;
+            } catch (ClassNotFoundException ignore){
+                return false;
+            }
+        }
+
+        private static boolean isJava8orHigher(){
+            try {
+                Class.forName("java.util.Optional");
+                return true;
+            } catch (ClassNotFoundException ignore){
+                return false;
+            }
+        }
+
+        static class MethodHandleSupport {
+
+            static final Constructor<MethodHandles.Lookup> cachedLookupConstructor;
+
+            static {
+                if (JAVA_7_OR_HIGHER) {
+                    try {
+                        cachedLookupConstructor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class);
+
+                        if (!cachedLookupConstructor.isAccessible()) {
+                            cachedLookupConstructor.setAccessible(true);
+                        }
+                    } catch (Exception o_O) {
+                        throw new IllegalStateException(o_O);
+                    }
+                } else {
+                    cachedLookupConstructor = null;
+                }
+            }
+
+            static MethodHandles.Lookup lookupIn(Class<?> type) throws Throwable {
+                return (MethodHandles.Lookup) cachedLookupConstructor.newInstance(type);
+            }
+        }
+
+        static class DefaultMethodSupport {
+
+            static boolean isDefaultMethod(Method method){
+                //Java 8 guard to remain compatible with older Java Versions.
+                return JAVA_8_OR_HIGHER && method.isDefault();
+            }
+
+            static <P> Object invokeDefaultMethod(Object target, Class<P> type, Method method, Object... args) throws Throwable {
+                return MethodHandleSupport.lookupIn(type)
+                  .unreflectSpecial(method, type)
+                  .bindTo(target)
+                  .invokeWithArguments(args);
+            }
+        }
+    }
 }

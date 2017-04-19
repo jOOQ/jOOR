@@ -32,12 +32,18 @@ import org.joor.ReflectException;
 import org.joor.test.Test2.ConstructorType;
 import org.joor.test.Test3.MethodType;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Lukas Eder
+ * @author Thomas Darimont
  */
 public class ReflectTest {
+
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testOn() {
@@ -500,6 +506,20 @@ public class ReflectTest {
         assertTrue(a.equals(c));
         //noinspection ObjectEqualsNull
         assertFalse(a.equals(null));
+    }
+
+    @Test //See #31
+    public void shouldCallDefaultMethod(){
+
+        int answer = Reflect.on(new Object()).as(InterfaceWithDefaultMethods.class).returnAnInt();
+        assertEquals(42, answer);
+    }
+
+    @Test //See #31
+    public void shouldThrowExceptionThrownByDefaultMethod(){
+
+        expectedException.expect(IllegalArgumentException.class);
+        Reflect.on(new Object()).as(InterfaceWithDefaultMethods.class).throwIllegalArgumentException();
     }
 
     @Before
