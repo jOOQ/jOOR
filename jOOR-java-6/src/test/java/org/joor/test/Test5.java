@@ -14,17 +14,13 @@
 package org.joor.test;
 
 /**
- * @author Thomas Darimont
+ * @author Lukas Eder
  */
-public interface InterfaceWithDefaultMethods {
+public interface Test5 {
 
-    /* [java-8] */
-    default int returnAnInt() {
-        return 42;
-    }
+    String substring(int beginIndex);
+    String substring(int beginIndex, int endIndex);
 
-    default int throwIllegalArgumentException() {
-        throw new IllegalArgumentException("oh oh");
-    }
-    /* [/java-8] */
+    String substring(Integer beginIndex);
+    String substring(Integer beginIndex, Integer endIndex);
 }

@@ -13,18 +13,13 @@
  */
 package org.joor.test;
 
-/**
- * @author Thomas Darimont
- */
-public interface InterfaceWithDefaultMethods {
+import java.util.HashMap;
+import java.util.Map;
 
-    /* [java-8] */
-    default int returnAnInt() {
-        return 42;
-    }
+public class Test9 {
+    Map<String, String> map= new HashMap<String, String>();
 
-    default int throwIllegalArgumentException() {
-        throw new IllegalArgumentException("oh oh");
+    public void put(String name, String value)  {
+        map.put(name, value);
     }
-    /* [/java-8] */
 }

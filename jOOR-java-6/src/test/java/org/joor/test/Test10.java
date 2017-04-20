@@ -14,17 +14,27 @@
 package org.joor.test;
 
 /**
- * @author Thomas Darimont
+ * @author Lukas Eder
  */
-public interface InterfaceWithDefaultMethods {
+public class Test10 {
 
-    /* [java-8] */
-    default int returnAnInt() {
-        return 42;
+    public final String  s;
+    public final Integer i;
+
+    Test10(int i) {
+        this(null, i);
     }
 
-    default int throwIllegalArgumentException() {
-        throw new IllegalArgumentException("oh oh");
+    Test10(String s) {
+        this(s, null);
     }
-    /* [/java-8] */
+
+    Test10(String s, int i) {
+        this(s, (Integer) i);
+    }
+
+    Test10(String s, Integer i) {
+        this.s = s;
+        this.i = i;
+    }
 }

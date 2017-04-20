@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.jooq</groupId>
-    <artifactId>joor</artifactId>
+    <artifactId>joor-java-6</artifactId>
     <version>0.9.7</version>
     <packaging>bundle</packaging>
 
@@ -46,8 +46,8 @@
                     <maxmem>512m</maxmem>
                     <meminitial>256m</meminitial>
                     <encoding>UTF-8</encoding>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                     <debug>true</debug>
                     <debuglevel>lines,vars,source</debuglevel>
                 </configuration>

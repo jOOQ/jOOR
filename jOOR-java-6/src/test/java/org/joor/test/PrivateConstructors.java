@@ -13,18 +13,16 @@
  */
 package org.joor.test;
 
-/**
- * @author Thomas Darimont
- */
-public interface InterfaceWithDefaultMethods {
+@SuppressWarnings("all")
+public class PrivateConstructors {
 
-    /* [java-8] */
-    default int returnAnInt() {
-        return 42;
+    public final String string;
+
+    private PrivateConstructors() {
+        this(null);
     }
 
-    default int throwIllegalArgumentException() {
-        throw new IllegalArgumentException("oh oh");
+    private PrivateConstructors(String string) {
+        this.string = string;
     }
-    /* [/java-8] */
 }

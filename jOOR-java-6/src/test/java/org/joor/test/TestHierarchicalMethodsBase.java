@@ -13,18 +13,28 @@
  */
 package org.joor.test;
 
-/**
- * @author Thomas Darimont
- */
-public interface InterfaceWithDefaultMethods {
+public class TestHierarchicalMethodsBase {
 
-    /* [java-8] */
-    default int returnAnInt() {
-        return 42;
+    public static String PUBLIC_RESULT = "PUBLIC_BASE";
+    public static String PRIVATE_RESULT = "PRIVATE_BASE";
+
+    private int invisibleField1;
+    private int invisibleField2;
+    public int visibleField1;
+    public int visibleField2;
+
+    public String pub_base_method(int number) {
+        return PUBLIC_RESULT;
+    }
+    public String pub_method(int number) {
+        return PUBLIC_RESULT;
     }
 
-    default int throwIllegalArgumentException() {
-        throw new IllegalArgumentException("oh oh");
+    private String priv_method(int number) {
+        return PRIVATE_RESULT;
     }
-    /* [/java-8] */
+
+    private String very_priv_method() {
+        return PRIVATE_RESULT;
+    }
 }

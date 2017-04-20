@@ -13,18 +13,11 @@
  */
 package org.joor.test;
 
-/**
- * @author Thomas Darimont
- */
-public interface InterfaceWithDefaultMethods {
+public class Test8 {
 
-    /* [java-8] */
-    default int returnAnInt() {
-        return 42;
+    private static void s_method() {
     }
 
-    default int throwIllegalArgumentException() {
-        throw new IllegalArgumentException("oh oh");
+    private void i_method() {
     }
-    /* [/java-8] */
 }

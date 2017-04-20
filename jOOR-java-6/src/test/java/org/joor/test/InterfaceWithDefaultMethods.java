@@ -18,13 +18,13 @@ package org.joor.test;
  */
 public interface InterfaceWithDefaultMethods {
 
-    /* [java-8] */
-    default int returnAnInt() {
-        return 42;
-    }
 
-    default int throwIllegalArgumentException() {
-        throw new IllegalArgumentException("oh oh");
-    }
-    /* [/java-8] */
+
+
+
+
+
+
+
+
 }

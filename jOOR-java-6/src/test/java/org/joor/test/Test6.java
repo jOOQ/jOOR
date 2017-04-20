@@ -13,18 +13,13 @@
  */
 package org.joor.test;
 
-/**
- * @author Thomas Darimont
- */
-public interface InterfaceWithDefaultMethods {
+public interface Test6 {
+    void setFoo(String s);
+    void setBar(boolean b);
+    void setBaz(String baz);
+    void testIgnore();
 
-    /* [java-8] */
-    default int returnAnInt() {
-        return 42;
-    }
-
-    default int throwIllegalArgumentException() {
-        throw new IllegalArgumentException("oh oh");
-    }
-    /* [/java-8] */
+    String getFoo();
+    boolean isBar();
+    String getBaz();
 }
