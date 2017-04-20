@@ -32,21 +32,27 @@ import org.joor.ReflectException;
 import org.joor.test.Test2.ConstructorType;
 import org.joor.test.Test3.MethodType;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Lukas Eder
+ * @author Thomas Darimont
  */
 public class ReflectTest {
+
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testOn() {
         assertEquals(on(Object.class), on("java.lang.Object", ClassLoader.getSystemClassLoader()));
         assertEquals(on(Object.class), on("java.lang.Object"));
-        assertEquals(on(Object.class).get(), on("java.lang.Object").get());
+        assertEquals((Object)on(Object.class).get(), on("java.lang.Object").get());
         assertEquals(Object.class, on(Object.class).get());
         assertEquals("abc", on((Object) "abc").get());
-        assertEquals(1, on(1).get());
+        assertEquals((Integer)1, on(1).get());
 
         try {
             on("asdf");
@@ -120,8 +126,8 @@ public class ReflectTest {
         assertEquals("12", on((Object) "1234").call("substring", 0, 2).get());
         assertEquals("1234", on((Object) "12").call("concat", "34").get());
         assertEquals("123456", on((Object) "12").call("concat", "34").call("concat", "56").get());
-        assertEquals(2, on((Object) "1234").call("indexOf", "3").get());
-        assertEquals(2.0f, on((Object) "1234").call("indexOf", "3").call("floatValue").get());
+        assertEquals((Integer)2, on((Object) "1234").call("indexOf", "3").get());
+        assertEquals((Float)2.0f, on((Object) "1234").call("indexOf", "3").call("floatValue").get());
         assertEquals("2", on((Object) "1234").call("indexOf", "3").call("toString").get());
 
         // Static methods
@@ -224,44 +230,44 @@ public class ReflectTest {
         // Instance methods
         // ----------------
         Test1 test1 = new Test1();
-        assertEquals(1, on(test1).set("I_INT1", 1).get("I_INT1"));
-        assertEquals(1, on(test1).field("I_INT1").get());
-        assertEquals(1, on(test1).set("I_INT2", 1).get("I_INT2"));
-        assertEquals(1, on(test1).field("I_INT2").get());
+        assertEquals((Integer)1, on(test1).set("I_INT1", 1).get("I_INT1"));
+        assertEquals((Integer)1, on(test1).field("I_INT1").get());
+        assertEquals((Integer)1, on(test1).set("I_INT2", 1).get("I_INT2"));
+        assertEquals((Integer)1, on(test1).field("I_INT2").get());
         assertNull(on(test1).set("I_INT2", null).get("I_INT2"));
         assertNull(on(test1).field("I_INT2").get());
 
         // Static methods
         // --------------
-        assertEquals(1, on(Test1.class).set("S_INT1", 1).get("S_INT1"));
-        assertEquals(1, on(Test1.class).field("S_INT1").get());
-        assertEquals(1, on(Test1.class).set("S_INT2", 1).get("S_INT2"));
-        assertEquals(1, on(Test1.class).field("S_INT2").get());
+        assertEquals((Integer)1, on(Test1.class).set("S_INT1", 1).get("S_INT1"));
+        assertEquals((Integer)1, on(Test1.class).field("S_INT1").get());
+        assertEquals((Integer)1, on(Test1.class).set("S_INT2", 1).get("S_INT2"));
+        assertEquals((Integer)1, on(Test1.class).field("S_INT2").get());
         assertNull(on(Test1.class).set("S_INT2", null).get("S_INT2"));
         assertNull(on(Test1.class).field("S_INT2").get());
 
         // Hierarchies
         // -----------
         TestHierarchicalMethodsSubclass test2 = new TestHierarchicalMethodsSubclass();
-        assertEquals(1, on(test2).set("invisibleField1", 1).get("invisibleField1"));
-        assertEquals(1, accessible(TestHierarchicalMethodsBase.class.getDeclaredField("invisibleField1")).get(test2));
+        assertEquals((Integer)1, on(test2).set("invisibleField1", 1).get("invisibleField1"));
+        assertEquals((Integer)1, accessible(TestHierarchicalMethodsBase.class.getDeclaredField("invisibleField1")).get(test2));
 
-        assertEquals(1, on(test2).set("invisibleField2", 1).get("invisibleField2"));
-        assertEquals(0, accessible(TestHierarchicalMethodsBase.class.getDeclaredField("invisibleField2")).get(test2));
-        assertEquals(1, accessible(TestHierarchicalMethodsSubclass.class.getDeclaredField("invisibleField2")).get(test2));
+        assertEquals((Integer)1, on(test2).set("invisibleField2", 1).get("invisibleField2"));
+        assertEquals((Integer)0, accessible(TestHierarchicalMethodsBase.class.getDeclaredField("invisibleField2")).get(test2));
+        assertEquals((Integer)1, accessible(TestHierarchicalMethodsSubclass.class.getDeclaredField("invisibleField2")).get(test2));
 
-        assertEquals(1, on(test2).set("invisibleField3", 1).get("invisibleField3"));
-        assertEquals(1, accessible(TestHierarchicalMethodsSubclass.class.getDeclaredField("invisibleField3")).get(test2));
+        assertEquals((Integer)1, on(test2).set("invisibleField3", 1).get("invisibleField3"));
+        assertEquals((Integer)1, accessible(TestHierarchicalMethodsSubclass.class.getDeclaredField("invisibleField3")).get(test2));
 
-        assertEquals(1, on(test2).set("visibleField1", 1).get("visibleField1"));
-        assertEquals(1, accessible(TestHierarchicalMethodsBase.class.getDeclaredField("visibleField1")).get(test2));
+        assertEquals((Integer)1, on(test2).set("visibleField1", 1).get("visibleField1"));
+        assertEquals((Integer)1, accessible(TestHierarchicalMethodsBase.class.getDeclaredField("visibleField1")).get(test2));
 
-        assertEquals(1, on(test2).set("visibleField2", 1).get("visibleField2"));
-        assertEquals(0, accessible(TestHierarchicalMethodsBase.class.getDeclaredField("visibleField2")).get(test2));
-        assertEquals(1, accessible(TestHierarchicalMethodsSubclass.class.getDeclaredField("visibleField2")).get(test2));
+        assertEquals((Integer)1, on(test2).set("visibleField2", 1).get("visibleField2"));
+        assertEquals((Integer)0, accessible(TestHierarchicalMethodsBase.class.getDeclaredField("visibleField2")).get(test2));
+        assertEquals((Integer)1, accessible(TestHierarchicalMethodsSubclass.class.getDeclaredField("visibleField2")).get(test2));
 
-        assertEquals(1, on(test2).set("visibleField3", 1).get("visibleField3"));
-        assertEquals(1, accessible(TestHierarchicalMethodsSubclass.class.getDeclaredField("visibleField3")).get(test2));
+        assertEquals((Integer)1, on(test2).set("visibleField3", 1).get("visibleField3"));
+        assertEquals((Integer)1, accessible(TestHierarchicalMethodsSubclass.class.getDeclaredField("visibleField3")).get(test2));
 
         assertNull(accessible(null));
     }
@@ -271,19 +277,19 @@ public class ReflectTest {
         // Instance methods
         // ----------------
         Test11 test11 = new Test11();
-        assertEquals(1, on(test11).set("F_INT1", 1).get("F_INT1"));
-        assertEquals(1, on(test11).field("F_INT1").get());
-        assertEquals(1, on(test11).set("F_INT2", 1).get("F_INT1"));
-        assertEquals(1, on(test11).field("F_INT2").get());
+        assertEquals((Integer)1, on(test11).set("F_INT1", 1).get("F_INT1"));
+        assertEquals((Integer)1, on(test11).field("F_INT1").get());
+        assertEquals((Integer)1, on(test11).set("F_INT2", 1).get("F_INT1"));
+        assertEquals((Integer)1, on(test11).field("F_INT2").get());
         assertNull(on(test11).set("F_INT2", null).get("F_INT2"));
         assertNull(on(test11).field("F_INT2").get());
 
         // Static methods
         // ----------------
-        assertEquals(1, on(Test11.class).set("SF_INT1", 1).get("SF_INT1"));
-        assertEquals(1, on(Test11.class).field("SF_INT1").get());
-        assertEquals(1, on(Test11.class).set("SF_INT2", 1).get("SF_INT2"));
-        assertEquals(1, on(Test11.class).field("SF_INT2").get());
+        assertEquals((Integer)1, on(Test11.class).set("SF_INT1", 1).get("SF_INT1"));
+        assertEquals((Integer)1, on(Test11.class).field("SF_INT1").get());
+        assertEquals((Integer)1, on(Test11.class).set("SF_INT2", 1).get("SF_INT2"));
+        assertEquals((Integer)1, on(Test11.class).field("SF_INT2").get());
         on(Test11.class).set("SF_INT2", 1).field("SF_INT2").get();;
         assertNull(on(Test11.class).set("SF_INT2", null).get("SF_INT2"));
         assertNull(on(Test11.class).field("SF_INT2").get());
@@ -317,10 +323,10 @@ public class ReflectTest {
         assertTrue(on(test1).fields().containsKey("I_INT2"));
         assertTrue(on(test1).fields().containsKey("I_DATA"));
 
-        assertEquals(1, on(test1).set("I_INT1", 1).fields().get("I_INT1").get());
-        assertEquals(1, on(test1).fields().get("I_INT1").get());
-        assertEquals(1, on(test1).set("I_INT2", 1).fields().get("I_INT2").get());
-        assertEquals(1, on(test1).fields().get("I_INT2").get());
+        assertEquals((Integer)1, on(test1).set("I_INT1", 1).fields().get("I_INT1").get());
+        assertEquals((Integer)1, on(test1).fields().get("I_INT1").get());
+        assertEquals((Integer)1, on(test1).set("I_INT2", 1).fields().get("I_INT2").get());
+        assertEquals((Integer)1, on(test1).fields().get("I_INT2").get());
         assertNull(on(test1).set("I_INT2", null).fields().get("I_INT2").get());
         assertNull(on(test1).fields().get("I_INT2").get());
 
@@ -331,10 +337,10 @@ public class ReflectTest {
         assertTrue(on(Test1.class).fields().containsKey("S_INT2"));
         assertTrue(on(Test1.class).fields().containsKey("S_DATA"));
 
-        assertEquals(1, on(Test1.class).set("S_INT1", 1).fields().get("S_INT1").get());
-        assertEquals(1, on(Test1.class).fields().get("S_INT1").get());
-        assertEquals(1, on(Test1.class).set("S_INT2", 1).fields().get("S_INT2").get());
-        assertEquals(1, on(Test1.class).fields().get("S_INT2").get());
+        assertEquals((Integer)1, on(Test1.class).set("S_INT1", 1).fields().get("S_INT1").get());
+        assertEquals((Integer)1, on(Test1.class).fields().get("S_INT1").get());
+        assertEquals((Integer)1, on(Test1.class).set("S_INT2", 1).fields().get("S_INT2").get());
+        assertEquals((Integer)1, on(Test1.class).fields().get("S_INT2").get());
         assertNull(on(Test1.class).set("S_INT2", null).fields().get("S_INT2").get());
         assertNull(on(Test1.class).fields().get("S_INT2").get());
 
@@ -500,6 +506,20 @@ public class ReflectTest {
         assertTrue(a.equals(c));
         //noinspection ObjectEqualsNull
         assertFalse(a.equals(null));
+    }
+
+    @Test //See #31
+    public void shouldCallDefaultMethod(){
+
+        int answer = Reflect.on(new Object()).as(InterfaceWithDefaultMethods.class).returnAnInt();
+        assertEquals(42, answer);
+    }
+
+    @Test //See #31
+    public void shouldThrowExceptionThrownByDefaultMethod(){
+
+        expectedException.expect(IllegalArgumentException.class);
+        Reflect.on(new Object()).as(InterfaceWithDefaultMethods.class).throwIllegalArgumentException();
     }
 
     @Before
