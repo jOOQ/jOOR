@@ -1,7 +1,4 @@
 language: java
-jdk:
-  - oraclejdk8
-  - openjdk6
 install: 
   - jdk_switcher use oraclejdk8
   - sh -c 'cd jOOR && mvn install -DskipTests=true'
