@@ -45,6 +45,13 @@ public class ReflectTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
+    @Before
+    public void setUp() {
+        Test1.S_INT1 = 0;
+        Test1.S_INT2 = null;
+        Test1.S_DATA = null;
+    }
+
     @Test
     public void testOn() {
         assertEquals(on(Object.class), on("java.lang.Object", ClassLoader.getSystemClassLoader()));
@@ -523,10 +530,29 @@ public class ReflectTest {
 
 
 
-    @Before
-    public void setUp() {
-        Test1.S_INT1 = 0;
-        Test1.S_INT2 = null;
-        Test1.S_DATA = null;
+    @Test
+    public void testNullStaticFieldType() {
+        Map<String, Reflect> fields = Reflect.on(Test1.class).fields();
+
+        assertEquals(3, fields.size());
+        assertEquals(int.class, fields.get("S_INT1").type());
+        assertEquals(Integer.valueOf(0), fields.get("S_INT1").get());
+        assertEquals(Integer.class, fields.get("S_INT2").type());
+        assertNull(fields.get("S_INT2").get());
+        assertEquals(Test1.class, fields.get("S_DATA").type());
+        assertNull(fields.get("S_DATA").get());
+    }
+
+    @Test
+    public void testNullInstanceFieldType() {
+        Map<String, Reflect> fields = Reflect.on(new Test1()).fields();
+
+        assertEquals(3, fields.size());
+        assertEquals(int.class, fields.get("I_INT1").type());
+        assertEquals(Integer.valueOf(0), fields.get("I_INT1").get());
+        assertEquals(Integer.class, fields.get("I_INT2").type());
+        assertNull(fields.get("I_INT2").get());
+        assertEquals(Test1.class, fields.get("I_DATA").type());
+        assertNull(fields.get("I_DATA").get());
     }
 }
