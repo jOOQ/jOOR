@@ -45,6 +45,13 @@ public class ReflectTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
+    @Before
+    public void setUp() {
+        Test1.S_INT1 = 0;
+        Test1.S_INT2 = null;
+        Test1.S_DATA = null;
+    }
+
     @Test
     public void testOn() {
         assertEquals(on(Object.class), on("java.lang.Object", ClassLoader.getSystemClassLoader()));
@@ -522,11 +529,4 @@ public class ReflectTest {
         Reflect.on(new Object()).as(InterfaceWithDefaultMethods.class).throwIllegalArgumentException();
     }
     /* [/java-8] */
-
-    @Before
-    public void setUp() {
-        Test1.S_INT1 = 0;
-        Test1.S_INT2 = null;
-        Test1.S_DATA = null;
-    }
 }
