@@ -19,5 +19,7 @@ public class Test8 {
     }
 
     private void i_method() {
+	
+	
     }
 }
