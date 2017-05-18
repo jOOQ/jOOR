@@ -13,7 +13,7 @@
  */
 package org.joor;
 
-import java.lang.invoke.MethodHandles;
+// ...
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
