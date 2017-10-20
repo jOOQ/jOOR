@@ -32,6 +32,7 @@ import org.joor.ReflectException;
 import org.joor.test.Test2.ConstructorType;
 import org.joor.test.Test3.MethodType;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -318,6 +319,21 @@ public class ReflectTest {
         assertEquals(new Integer(0), Test11.S_DATA.F_INT2);
         assertEquals(1, Test11.S_DATA.I_DATA.F_INT1);
         assertEquals(new Integer(1), Test11.S_DATA.I_DATA.F_INT2);
+    }
+
+    @Test
+    @Ignore
+    public void testPrivateStaticFinal() {
+        Reflect reflect = on(TestPrivateStaticFinal.class);
+
+        assertEquals(1, (int) reflect.get("I1"));
+        assertEquals(Integer.valueOf(1), reflect.get("I2"));
+
+        reflect.set("I1", 2);
+        reflect.set("I2", 2);
+
+        assertEquals(2, (int) reflect.get("I1"));
+        assertEquals(Integer.valueOf(2), reflect.get("I2"));
     }
 
     @Test
