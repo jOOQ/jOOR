@@ -1,6 +1,7 @@
 language: java
 jdk:
   - oraclejdk8
+  - oraclejdk9
 install: 
   - sh -c 'cd jOOR && mvn install -DskipTests=true'
   - sh -c 'cd jOOR-java-6 && mvn install -DskipTests=true'
