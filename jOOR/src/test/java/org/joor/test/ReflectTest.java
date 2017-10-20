@@ -326,13 +326,13 @@ public class ReflectTest {
     public void testPrivateStaticFinal() {
         Reflect reflect = on(TestPrivateStaticFinal.class);
 
-        assertEquals(1, (int) reflect.get("I1"));
+        assertEquals(Integer.valueOf(1), reflect.get("I1"));
         assertEquals(Integer.valueOf(1), reflect.get("I2"));
 
         reflect.set("I1", 2);
         reflect.set("I2", 2);
 
-        assertEquals(2, (int) reflect.get("I1"));
+        assertEquals(Integer.valueOf(2), reflect.get("I1"));
         assertEquals(Integer.valueOf(2), reflect.get("I2"));
     }
 
