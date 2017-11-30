@@ -9,6 +9,37 @@ jOOR's name is inspired by jOOQ, a fluent API for SQL building and execution.
 
 None!
 
+### Download
+
+**For use with Java 9+**
+
+```xml
+<dependency>
+  <groupId>org.jooq</groupId>
+  <artifactId>joor</artifactId>
+  <version>0.9.7</version>
+</dependency>
+```
+
+**For use with Java 8+**
+
+```xml
+<dependency>
+  <groupId>org.jooq</groupId>
+  <artifactId>joor-java-8</artifactId>
+  <version>0.9.7</version>
+</dependency>
+```
+
+**For use with Java 6+**
+
+```xml
+<dependency>
+  <groupId>org.jooq</groupId>
+  <artifactId>joor-java-6</artifactId>
+  <version>0.9.7</version>
+</dependency>
+```
 
 ### Simple example
 
@@ -90,22 +121,4 @@ Everyday Java reflection with a fluent interface:
 Reflection modelled as XPath (quite interesting!)
 
  * http://commons.apache.org/jxpath/users-guide.html
-
-### Download
-For Maven user:(update version if necessary)
-```xml
-<dependency>
-  <groupId>org.jooq</groupId>
-  <artifactId>joor</artifactId>
-  <version>0.9.6</version>
-  <type>pom</type>
-</dependency>
-```
-
-For Gradle user:(update version if necessary)
-```gradle
-implementation 'org.jooq:joor:0.9.6'
-```
-
-Or download jar directly [LAST RELEASE](../../releases/latest)
 
