@@ -91,3 +91,21 @@ Reflection modelled as XPath (quite interesting!)
 
  * http://commons.apache.org/jxpath/users-guide.html
 
+### Download
+For Maven user:(update version if necessary)
+```xml
+<dependency>
+  <groupId>org.jooq</groupId>
+  <artifactId>joor</artifactId>
+  <version>0.9.6</version>
+  <type>pom</type>
+</dependency>
+```
+
+For Gradle user:(update version if necessary)
+```gradle
+implementation 'org.jooq:joor:0.9.6'
+```
+
+Or download jar directly [LAST RELEASE](../../releases/latest)
+
