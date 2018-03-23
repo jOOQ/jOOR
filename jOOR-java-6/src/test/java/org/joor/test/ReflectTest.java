@@ -43,6 +43,8 @@ import org.junit.rules.ExpectedException;
  */
 public class ReflectTest {
 
+    static final boolean JDK9 = false                                       ;
+
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
@@ -280,27 +282,36 @@ public class ReflectTest {
         assertNull(accessible(null));
     }
 
-     @Test
-    public void testFinalFields(){
-        // Instance methods
-        // ----------------
-        Test11 test11 = new Test11();
-        assertEquals(1, (int) (Integer) on(test11).set("F_INT1", 1).get("F_INT1"));
-        assertEquals(1, (int) (Integer) on(test11).field("F_INT1").get());
-        assertEquals(1, (int) (Integer) on(test11).set("F_INT2", 1).get("F_INT1"));
-        assertEquals(1, (int) (Integer) on(test11).field("F_INT2").get());
-        assertNull(on(test11).set("F_INT2", null).get("F_INT2"));
-        assertNull(on(test11).field("F_INT2").get());
+    @Test
+    public void testFinalFields() {
 
-        // Static methods
-        // ----------------
-        assertEquals(1, (int) (Integer) on(Test11.class).set("SF_INT1", 1).get("SF_INT1"));
-        assertEquals(1, (int) (Integer) on(Test11.class).field("SF_INT1").get());
-        assertEquals(1, (int) (Integer) on(Test11.class).set("SF_INT2", 1).get("SF_INT2"));
-        assertEquals(1, (int) (Integer) on(Test11.class).field("SF_INT2").get());
-        on(Test11.class).set("SF_INT2", 1).field("SF_INT2").get();;
-        assertNull(on(Test11.class).set("SF_INT2", null).get("SF_INT2"));
-        assertNull(on(Test11.class).field("SF_INT2").get());
+        try {
+            // Instance methods
+            // ----------------
+            Test11 test11 = new Test11();
+            assertEquals(1, (int) (Integer) on(test11).set("F_INT1", 1).get("F_INT1"));
+            assertEquals(1, (int) (Integer) on(test11).field("F_INT1").get());
+            assertEquals(1, (int) (Integer) on(test11).set("F_INT2", 1).get("F_INT1"));
+            assertEquals(1, (int) (Integer) on(test11).field("F_INT2").get());
+            assertNull(on(test11).set("F_INT2", null).get("F_INT2"));
+            assertNull(on(test11).field("F_INT2").get());
+
+            // Static methods
+            // ----------------
+            assertEquals(1, (int) (Integer) on(Test11.class).set("SF_INT1", 1).get("SF_INT1"));
+            assertEquals(1, (int) (Integer) on(Test11.class).field("SF_INT1").get());
+            assertEquals(1, (int) (Integer) on(Test11.class).set("SF_INT2", 1).get("SF_INT2"));
+            assertEquals(1, (int) (Integer) on(Test11.class).field("SF_INT2").get());
+            on(Test11.class).set("SF_INT2", 1).field("SF_INT2").get();
+            assertNull(on(Test11.class).set("SF_INT2", null).get("SF_INT2"));
+            assertNull(on(Test11.class).field("SF_INT2").get());
+        }
+        catch (ReflectException e) {
+
+            // [#50] This may no longer work on JDK 9
+            if (!JDK9)
+                throw e;
+        }
     }
 
     @Test
