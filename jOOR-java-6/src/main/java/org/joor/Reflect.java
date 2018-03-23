@@ -233,11 +233,18 @@ public class Reflect {
     public Reflect set(String name, Object value) throws ReflectException {
         try {
             Field field = field0(name);
+
             if ((field.getModifiers() & Modifier.FINAL) == Modifier.FINAL) {
-                Field modifiersField = Field.class.getDeclaredField("modifiers");
-                modifiersField.setAccessible(true);
-                modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+                try {
+                    Field modifiersField = Field.class.getDeclaredField("modifiers");
+                    modifiersField.setAccessible(true);
+                    modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+                }
+
+                // [#48] E.g. Android doesn't have this field
+                catch (NoSuchFieldException ignore) {}
             }
+
             field.set(object, unwrap(value));
             return this;
         }
