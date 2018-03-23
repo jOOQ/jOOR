@@ -113,7 +113,7 @@ public class ReflectTest {
         assertEquals("abc", test.n);
         assertEquals(ConstructorType.OBJECT, test.constructorType);
 
-        test = on(Test2.class).create(new Long("1")).get();
+        test = on(Test2.class).create(1L).get();
         assertEquals(1L, test.n);
         assertEquals(ConstructorType.NUMBER, test.constructorType);
 
@@ -222,7 +222,7 @@ public class ReflectTest {
         assertEquals("abc", test.n);
         assertEquals(MethodType.OBJECT, test.methodType);
 
-        test = on(Test3.class).create().call("method", new Long("1")).get();
+        test = on(Test3.class).create().call("method", 1L).get();
         assertEquals(1L, test.n);
         assertEquals(MethodType.NUMBER, test.methodType);
 
@@ -316,20 +316,28 @@ public class ReflectTest {
 
     @Test
     public void testFinalFieldAdvanced() {
-        on(Test11.class).set("S_DATA", on(Test11.class).create())
-                .field("S_DATA")
-                .set("I_DATA", on(Test11.class).create())
-                .field("I_DATA")
-                .set("F_INT1", 1)
-                .set("F_INT2", 1)
-                .set("SF_INT1", 2)
-                .set("SF_INT2", 2);
-        assertEquals(2, Test11.SF_INT1);
-        assertEquals(new Integer(2), Test11.SF_INT2);
-        assertEquals(0, Test11.S_DATA.F_INT1);
-        assertEquals(new Integer(0), Test11.S_DATA.F_INT2);
-        assertEquals(1, Test11.S_DATA.I_DATA.F_INT1);
-        assertEquals(new Integer(1), Test11.S_DATA.I_DATA.F_INT2);
+        try {
+            on(Test11.class).set("S_DATA", on(Test11.class).create())
+                    .field("S_DATA")
+                    .set("I_DATA", on(Test11.class).create())
+                    .field("I_DATA")
+                    .set("F_INT1", 1)
+                    .set("F_INT2", 1)
+                    .set("SF_INT1", 2)
+                    .set("SF_INT2", 2);
+            assertEquals(2, Test11.SF_INT1);
+            assertEquals(2, (int) Test11.SF_INT2);
+            assertEquals(0, Test11.S_DATA.F_INT1);
+            assertEquals(0, (int) Test11.S_DATA.F_INT2);
+            assertEquals(1, Test11.S_DATA.I_DATA.F_INT1);
+            assertEquals(1, (int) Test11.S_DATA.I_DATA.F_INT2);
+        }
+        catch (ReflectException e) {
+
+            // [#50] This may no longer work on JDK 9
+            if (!JDK9)
+                throw e;
+        }
     }
 
     @Test
@@ -416,13 +424,13 @@ public class ReflectTest {
         assertEquals("b", on((Object) "abc").as(Test5.class).substring(1, 2));
         assertEquals("c", on((Object) "abc").as(Test5.class).substring(2, 3));
 
-        assertEquals("abc", on((Object) "abc").as(Test5.class).substring(new Integer(0)));
-        assertEquals("bc", on((Object) "abc").as(Test5.class).substring(new Integer(1)));
-        assertEquals("c", on((Object) "abc").as(Test5.class).substring(new Integer(2)));
+        assertEquals("abc", on((Object) "abc").as(Test5.class).substring(0));
+        assertEquals("bc", on((Object) "abc").as(Test5.class).substring(1));
+        assertEquals("c", on((Object) "abc").as(Test5.class).substring(2));
 
-        assertEquals("a", on((Object) "abc").as(Test5.class).substring(new Integer(0), new Integer(1)));
-        assertEquals("b", on((Object) "abc").as(Test5.class).substring(new Integer(1), new Integer(2)));
-        assertEquals("c", on((Object) "abc").as(Test5.class).substring(new Integer(2), new Integer(3)));
+        assertEquals("a", on((Object) "abc").as(Test5.class).substring(0, 1));
+        assertEquals("b", on((Object) "abc").as(Test5.class).substring(1, 2));
+        assertEquals("c", on((Object) "abc").as(Test5.class).substring(2, 3));
     }
 
     @Test
