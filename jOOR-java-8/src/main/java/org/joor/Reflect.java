@@ -14,6 +14,7 @@
 package org.joor;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -139,9 +140,8 @@ public class Reflect {
         }
 
         // [jOOQ #3392] The accessible flag is set to false by default, also for public members.
-        if (!accessible.isAccessible()) {
+        if (!accessible.isAccessible())
             accessible.setAccessible(true);
-        }
 
         return accessible;
     }
@@ -151,18 +151,24 @@ public class Reflect {
     // ---------------------------------------------------------------------
 
     /* [java-8] */
+    private static final Lookup                            LOOKUP;
     private static final Constructor<MethodHandles.Lookup> CACHED_LOOKUP_CONSTRUCTOR;
 
     static {
-        try {
-            CACHED_LOOKUP_CONSTRUCTOR = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class);
+        LOOKUP = MethodHandles.lookup();
+        Constructor<MethodHandles.Lookup> result = null;
 
-            if (!CACHED_LOOKUP_CONSTRUCTOR.isAccessible())
-                CACHED_LOOKUP_CONSTRUCTOR.setAccessible(true);
+        try {
+            result = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class);
+
+            if (!result.isAccessible())
+                result.setAccessible(true);
         }
-        catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+
+        // Can no longer access the above in JDK 9
+        catch (Throwable ignore) {}
+
+        CACHED_LOOKUP_CONSTRUCTOR = result;
     }
     /* [/java-8] */
 
@@ -579,7 +585,6 @@ public class Reflect {
         final boolean isMap = (object instanceof Map);
         final InvocationHandler handler = new InvocationHandler() {
             @SuppressWarnings("null")
-            @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 String name = method.getName();
 
@@ -608,6 +613,17 @@ public class Reflect {
 
                     /* [java-8] */
                     if (method.isDefault()) {
+
+
+
+
+
+
+
+
+
+
+                        // Java 8 version
                         return CACHED_LOOKUP_CONSTRUCTOR
                             .newInstance(proxyType)
                             .unreflectSpecial(method, proxyType)
