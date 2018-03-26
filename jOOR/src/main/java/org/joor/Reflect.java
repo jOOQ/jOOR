@@ -163,7 +163,9 @@ public class Reflect {
         }
 
         // Can no longer access the above in JDK 9
-        catch (Throwable ignore) {}
+        catch (Throwable ignore) {
+            result = null;
+        }
 
         CACHED_LOOKUP_CONSTRUCTOR = result;
     }
@@ -621,7 +623,6 @@ public class Reflect {
                                 .unreflectSpecial(method, proxyType)
                                 .bindTo(proxy)
                                 .invokeWithArguments(args);
-                            }
                         }
                         /* [/java-9] */
 
