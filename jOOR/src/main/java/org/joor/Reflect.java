@@ -621,7 +621,6 @@ public class Reflect {
                                 .unreflectSpecial(method, proxyType)
                                 .bindTo(proxy)
                                 .invokeWithArguments(args);
-                            }
                         }
                         /* [/java-9] */
 
