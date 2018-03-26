@@ -584,6 +584,7 @@ public class Reflect {
     public <P> P as(final Class<P> proxyType) {
         final boolean isMap = (object instanceof Map);
         final InvocationHandler handler = new InvocationHandler() {
+            @Override
             @SuppressWarnings("null")
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 String name = method.getName();
@@ -610,6 +611,8 @@ public class Reflect {
                             return null;
                         }
                     }
+
+
 
 
 

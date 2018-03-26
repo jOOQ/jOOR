@@ -584,6 +584,7 @@ public class Reflect {
     public <P> P as(final Class<P> proxyType) {
         final boolean isMap = (object instanceof Map);
         final InvocationHandler handler = new InvocationHandler() {
+            @Override
             @SuppressWarnings("null")
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 String name = method.getName();
@@ -616,11 +617,13 @@ public class Reflect {
 
                         /* [java-9] */
                         // Java 9 version
-                        if (CACHED_LOOKUP_CONSTRUCTOR == null)
-                            return MethodHandles.privateLookupIn(proxyType, LOOKUP)
+                        if (CACHED_LOOKUP_CONSTRUCTOR == null) {
+                            return LOOKUP
+                                .in(proxyType)
                                 .unreflectSpecial(method, proxyType)
                                 .bindTo(proxy)
                                 .invokeWithArguments(args);
+                        }
                         /* [/java-9] */
 
                         // Java 8 version
