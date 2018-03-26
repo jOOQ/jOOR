@@ -14,7 +14,6 @@
 package org.joor;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -151,11 +150,9 @@ public class Reflect {
     // ---------------------------------------------------------------------
 
     /* [java-8] */
-    private static final Lookup                            LOOKUP;
-    private static final Constructor<MethodHandles.Lookup> CACHED_LOOKUP_CONSTRUCTOR;
+    static final Constructor<MethodHandles.Lookup> CACHED_LOOKUP_CONSTRUCTOR;
 
     static {
-        LOOKUP = MethodHandles.lookup();
         Constructor<MethodHandles.Lookup> result = null;
 
         try {
@@ -618,11 +615,13 @@ public class Reflect {
                         /* [java-9] */
                         // Java 9 version
                         if (CACHED_LOOKUP_CONSTRUCTOR == null) {
-                            return LOOKUP
+                            return MethodHandles
+                                .privateLookupIn(proxyType, MethodHandles.lookup())
                                 .in(proxyType)
                                 .unreflectSpecial(method, proxyType)
                                 .bindTo(proxy)
                                 .invokeWithArguments(args);
+                            }
                         }
                         /* [/java-9] */
 
