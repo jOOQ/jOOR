@@ -14,7 +14,6 @@
 package org.joor;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -151,12 +150,15 @@ public class Reflect {
     // ---------------------------------------------------------------------
 
     /* [java-8] */
-    private static final Lookup                            LOOKUP;
-    private static final Constructor<MethodHandles.Lookup> CACHED_LOOKUP_CONSTRUCTOR;
+    static final Constructor<MethodHandles.Lookup> CACHED_LOOKUP_CONSTRUCTOR;
 
     static {
-        LOOKUP = MethodHandles.lookup();
-        Constructor<MethodHandles.Lookup> result = null;
+        Constructor<MethodHandles.Lookup> result;
+
+
+
+
+
 
         try {
             result = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class);
@@ -166,7 +168,9 @@ public class Reflect {
         }
 
         // Can no longer access the above in JDK 9
-        catch (Throwable ignore) {}
+        catch (Throwable ignore) {
+            result = null;
+        }
 
         CACHED_LOOKUP_CONSTRUCTOR = result;
     }
@@ -614,6 +618,7 @@ public class Reflect {
 
                     /* [java-8] */
                     if (method.isDefault()) {
+
 
 
 

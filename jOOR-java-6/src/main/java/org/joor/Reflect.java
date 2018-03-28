@@ -14,7 +14,6 @@
 package org.joor;
 
 // ...
-// ...
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -149,6 +148,11 @@ public class Reflect {
     // ---------------------------------------------------------------------
     // Members
     // ---------------------------------------------------------------------
+
+
+
+
+
 
 
 
@@ -611,6 +615,7 @@ public class Reflect {
                             return null;
                         }
                     }
+
 
 
 
