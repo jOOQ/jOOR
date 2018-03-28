@@ -153,22 +153,26 @@ public class Reflect {
     static final Constructor<MethodHandles.Lookup> CACHED_LOOKUP_CONSTRUCTOR;
 
     static {
+        Constructor<MethodHandles.Lookup> result;
+
         /* [java-9] */
         if (true)
-            CACHED_LOOKUP_CONSTRUCTOR = null;
+            result = null;
         else
         /* [/java-9] */
         try {
-            CACHED_LOOKUP_CONSTRUCTOR = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class);
+            result = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class);
 
-            if (!CACHED_LOOKUP_CONSTRUCTOR.isAccessible())
-                CACHED_LOOKUP_CONSTRUCTOR.setAccessible(true);
+            if (!result.isAccessible())
+                result.setAccessible(true);
         }
 
         // Can no longer access the above in JDK 9
         catch (Throwable ignore) {
-            CACHED_LOOKUP_CONSTRUCTOR = null;
+            result = null;
         }
+
+        CACHED_LOOKUP_CONSTRUCTOR = result;
     }
     /* [/java-8] */
 
