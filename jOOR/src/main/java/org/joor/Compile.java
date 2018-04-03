@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.net.URI;
+import java.security.SecureClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,9 +75,33 @@ class Compile {
                     // This method is called by client code from two levels up the current stack frame
                     // We need a private-access lookup from the class in that stack frame in order to get
                     // private-access to any local interfaces at that location.
-                    result = MethodHandles
-                        .privateLookupIn(StackWalker.getInstance(RETAIN_CLASS_REFERENCE).walk(s -> s.skip(2).findFirst().get().getDeclaringClass()), lookup)
-                        .defineClass(fileManager.o.getBytes());
+                    Class<?> caller = StackWalker
+                        .getInstance(RETAIN_CLASS_REFERENCE)
+                        .walk(s -> s
+                            .skip(2)
+                            .findFirst()
+                            .get()
+                            .getDeclaringClass());
+
+                    // If the compiled class is in the same package as the caller class, then
+                    // we can use the private-access Lookup of the caller class
+                    if (className.startsWith(caller.getPackageName() + ".")) {
+                        result = MethodHandles
+                            .privateLookupIn(caller, lookup)
+                            .defineClass(fileManager.o.getBytes());
+                    }
+
+                    // Otherwise, use an arbitrary class loader. This approach doesn't allow for
+                    // loading private-access interfaces in the compiled class's type hierarchy
+                    else {
+                        result = new ClassLoader() {
+                            @Override
+                            protected Class<?> findClass(String name) throws ClassNotFoundException {
+                                byte[] b = fileManager.o.getBytes();
+                                return defineClass(className, b, 0, b.length);
+                            }
+                        }.loadClass(className);
+                    }
                 }
                 /* [/java-9] */
 

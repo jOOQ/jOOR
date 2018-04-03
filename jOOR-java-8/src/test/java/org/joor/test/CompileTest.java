@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 public class CompileTest {
 
     @Test
-    public void testCompile1() throws Exception {
+    public void testCompileLocalInterfaceHierarchy() throws Exception {
         I i = Reflect.compile("org.joor.test.CompileTest1", "package org.joor.test; public class CompileTest1 implements org.joor.test.I {}").create().get();
         assertEquals("I.m()", i.m());
 
@@ -38,15 +38,31 @@ public class CompileTest {
     }
 
     @Test
-    public void testCompile2() {
+    public void testCompileSamePackage() {
         Supplier<String> supplier = Reflect.compile(
-                "org.joor.test.CompileTest3",
-                "package org.joor.test;\n" +
-                        "class CompileTest3 implements java.util.function.Supplier<String> {\n" +
-                        "  public String get() {\n" +
-                        "    return \"Hello World!\";\n" +
-                        "  }\n" +
-                        "}\n").create().get();
+            "org.joor.test.CompileTest3",
+            "package org.joor.test;\n" +
+            "class CompileTest3 implements java.util.function.Supplier<String> {\n" +
+            "  public String get() {\n" +
+            "    return \"Hello World!\";\n" +
+            "  }\n" +
+            "}\n"
+        ).create().get();
+
+        assertEquals("Hello World!", supplier.get());
+    }
+
+    @Test
+    public void testCompileDifferentPackage() {
+        Supplier<String> supplier = Reflect.compile(
+            "com.example.CompileTestDifferentPackage",
+            "package com.example;\n" +
+            "class CompileTestDifferentPackage implements java.util.function.Supplier<String> {\n" +
+            "  public String get() {\n" +
+            "    return \"Hello World!\";\n" +
+            "  }\n" +
+            "}\n"
+        ).create().get();
 
         assertEquals("Hello World!", supplier.get());
     }
