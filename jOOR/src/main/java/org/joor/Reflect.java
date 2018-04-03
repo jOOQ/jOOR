@@ -52,6 +52,32 @@ public class Reflect {
     // Static API used as entrance points to the fluent API
     // ---------------------------------------------------------------------
 
+    /* [java-8] */
+    /**
+     * Compile a class at runtime and reflect on it.
+     * <p>
+     * For example:
+     * <code><pre>
+     * Supplier&lt;String> supplier = Reflect.compile(
+     *   "org.joor.Test",
+     *   "package org.joor;\n" +
+     *   "class Test implements java.util.function.Supplier&lt;String> {\n" +
+     *   "  public String get() {\n" +
+     *   "    return \"Hello World!\";\n" +
+     *   "  }\n" +
+     *   "}\n").create().get();
+     * </pre></code>
+     *
+     * @param name The qualified class name
+     * @param content The source code for the class
+     * @return A wrapped {@link Class}
+     * @throws ReflectException if anything went wrong compiling the class.
+     */
+    public static Reflect compile(String name, String content) throws ReflectException {
+        return on(Compile.compile(name, content));
+    }
+    /* [/java-8] */
+
     /**
      * Wrap a class name.
      * <p>
