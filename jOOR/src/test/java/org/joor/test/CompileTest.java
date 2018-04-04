@@ -67,6 +67,28 @@ public class CompileTest {
         assertEquals("Hello World!", supplier.get());
     }
 
+    @Test
+    public void testRecompileSameClassName() {
+
+        // The class loader will cache the class name by default, so a new content shouldn't affect the type
+        Object o1 = Reflect.compile(
+            "org.joor.test.CompileSameClassName",
+            "package org.joor.test;" +
+            "class CompileSameClassName { public String toString() { return \"a\"; } }")
+            .create()
+            .get();
+
+        assertEquals("a", o1.toString());
+        Object o2 = Reflect.compile(
+            "org.joor.test.CompileSameClassName",
+            "package org.joor.test;" +
+            "class CompileSameClassName { public String toString() { return \"b\"; } }")
+            .create()
+            .get();
+
+        assertEquals("a", o2.toString());
+    }
+
     interface J {
         default String m() {
             return "J.m()";
