@@ -15,13 +15,16 @@ package org.joor.test;
 
 /* [java-8] */
 
-import static junit.framework.Assert.*;
-
 import org.joor.Reflect;
 import org.joor.test.CompileTest.J;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static junit.framework.Assert.assertEquals;
 
 /**
  * @author Lukas Eder
@@ -87,6 +90,17 @@ public class CompileTest {
             .get();
 
         assertEquals("a", o2.toString());
+    }
+
+    @Test
+    public void testCompileEnums() {
+        Class<Enum<?>> e = Reflect.compile(
+            "org.joor.test.CompiledEnum",
+            "package org.joor.test;" +
+            "enum CompiledEnum { a, b, c }")
+            .get();
+
+        assertEquals(Arrays.asList("a", "b", "c"), Stream.of(e.getEnumConstants()).map(Enum::name).collect(Collectors.toList()));
     }
 
     interface J {
