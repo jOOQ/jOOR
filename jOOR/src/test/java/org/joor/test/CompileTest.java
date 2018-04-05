@@ -16,6 +16,7 @@ package org.joor.test;
 /* [java-8] */
 
 import org.joor.Reflect;
+import org.joor.ReflectException;
 import org.joor.test.CompileTest.J;
 import org.junit.Test;
 
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Lukas Eder
@@ -101,6 +103,20 @@ public class CompileTest {
             .get();
 
         assertEquals(Arrays.asList("a", "b", "c"), Stream.of(e.getEnumConstants()).map(Enum::name).collect(Collectors.toList()));
+    }
+
+    @Test
+    public void testCompilationError() {
+        try {
+            Reflect.compile(
+                "org.joor.test.CompilationError",
+                "package org.joor.test;" +
+                "class CompilationError { a }"
+            );
+        }
+        catch (ReflectException e) {
+            assertTrue(e.getMessage(), e.getMessage().contains("Compilation error:"));
+        }
     }
 
     interface J {

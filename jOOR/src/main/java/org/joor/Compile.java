@@ -17,6 +17,7 @@ package org.joor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.net.URI;
@@ -56,8 +57,13 @@ class Compile {
 
                 List<CharSequenceJavaFileObject> files = new ArrayList<CharSequenceJavaFileObject>();
                 files.add(new CharSequenceJavaFileObject(className, content));
+                StringWriter out = new StringWriter();
 
-                compiler.getTask(null, fileManager, null, null, null, files).call();
+                compiler.getTask(out, fileManager, null, null, null, files).call();
+
+                if (fileManager.o == null)
+                    throw new ReflectException("Compilation error: " + out);
+
                 Class<?> result = null;
 
                 // This works if we have private-access to the interfaces in the class hierarchy
@@ -106,6 +112,9 @@ class Compile {
                 /* [/java-9] */
 
                 return result;
+            }
+            catch (ReflectException e) {
+                throw e;
             }
             catch (Exception e) {
                 throw new ReflectException("Error while compiling " + className, e);
