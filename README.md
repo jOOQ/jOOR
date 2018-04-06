@@ -70,6 +70,23 @@ String substring = on("java.lang.String")
                     .substring(6);         // Call a proxy method
 ````
 
+### Runtime compilation of Java code
+
+jOOR has an optional dependency on the `java.compiler` module and simplifies access to `javax.tools.JavaCompiler` through the following API:
+
+```java
+Supplier<String> supplier = Reflect.compile(
+    "com.example.HelloWorld",
+    "package com.example;\n" +
+    "class HelloWorld implements java.util.function.Supplier<String> {\n" +
+    "    public String get() {\n" +
+    "        return \"Hello World!\";\n" +
+    "    }\n" +
+    "}\n").create().get();
+
+// Prints "Hello World!"
+System.out.println(supplier.get());
+```
 
 ### Comparison with standard java.lang.reflect
 
