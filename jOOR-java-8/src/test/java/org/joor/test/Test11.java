@@ -15,9 +15,7 @@
  */
 package org.joor.test;
 
-/**
- * Created by jacob on 15.01.2017.
- */
+@SuppressWarnings("deprecation")
 public class Test11 {
 
 

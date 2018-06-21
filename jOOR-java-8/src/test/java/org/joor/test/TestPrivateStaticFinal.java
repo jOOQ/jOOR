@@ -18,6 +18,7 @@ package org.joor.test;
 /**
  * @author Lukas Eder
  */
+@SuppressWarnings("deprecation")
 public class TestPrivateStaticFinal {
     private static final int     I1 = new Integer(1);
     private static final Integer I2 = new Integer(1);
