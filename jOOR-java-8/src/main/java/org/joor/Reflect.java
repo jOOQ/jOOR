@@ -15,6 +15,7 @@ package org.joor;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -25,6 +26,7 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 
 /**
  * A wrapper for an {@link Object} or {@link Class} upon which reflective calls
@@ -282,6 +284,41 @@ public class Reflect {
             }
 
             field.set(object, unwrap(value));
+            setAccessibleObject(field);
+            return this;
+        }
+        catch (Exception e) {
+            throw new ReflectException(e);
+        }
+    }
+    /**
+     * 
+     * @param field 
+     * @param new value to wrapped 
+     * @return this
+     * @throws ReflectException
+     */
+    public <T>Reflect set(AccessibleObject f,T parentObject, Object value) throws ReflectException {
+    		try {
+    		  if (f instanceof array) {
+    	    	   Array.set(parentObject, ((array)f).index, value);
+    	    	   return this;
+    	       }
+            Field field = (Field) f;
+
+            if ((field.getModifiers() & Modifier.FINAL) == Modifier.FINAL) {
+                try {
+                    Field modifiersField = Field.class.getDeclaredField("modifiers");
+                    modifiersField.setAccessible(true);
+                    modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+                }
+
+                // [#48] E.g. Android doesn't have this field
+                catch (NoSuchFieldException ignore) {}
+            }
+
+            field.set(parentObject, unwrap(value));
+//            setAccessibleObject(field);
             return this;
         }
         catch (Exception e) {
@@ -308,7 +345,42 @@ public class Reflect {
     public <T> T get(String name) throws ReflectException {
         return field(name).<T>get();
     }
-
+    /**
+     * Get a Array index value.
+     * @param name The array index name
+     * @return The array index value
+     * @throws ReflectException If any reflection exception occurred.
+     * @see #array(int)
+     */
+    public Reflect array(int index) throws ReflectException{
+    	try {
+    		Object ob = Array.get(object, index);
+            Reflect newRef = on(ob.getClass(), ob);
+            newRef.setAccessibleObject(new array(index));
+            return newRef;
+        }
+        catch (Exception e) {
+            throw new ReflectException(e);
+        }
+    }
+    /**
+     * Get a faster wrapped field.
+     *
+     * @param f The field Field
+     * @return The wrapped field
+     * @throws ReflectException If any reflection exception occurred.
+     */
+    public Reflect field(AccessibleObject f) throws ReflectException {
+        try {
+            Field field = (Field) f;
+            Reflect newRef = on(field.getType(), field.get(object));
+            newRef.setAccessibleObject(field);
+            return newRef;
+        }
+        catch (Exception e) {
+            throw new ReflectException(e);
+        }
+    }
     /**
      * Get a wrapped field.
      * <p>
@@ -324,7 +396,9 @@ public class Reflect {
     public Reflect field(String name) throws ReflectException {
         try {
             Field field = field0(name);
-            return on(field.getType(), field.get(object));
+            Reflect newRef = on(field.getType(), field.get(object));
+            newRef.setAccessibleObject(field);
+            return newRef;
         }
         catch (Exception e) {
             throw new ReflectException(e);
@@ -390,7 +464,24 @@ public class Reflect {
 
         return result;
     }
-
+    /**
+     * Fast Call a method by its Method AccessibleObject.
+     * <p>
+     * This is a convenience method for calling
+     * <code>call(method, new Object[0])</code>
+     *
+     * @param method The method AccessibleObject
+     * @return The wrapped method result or the same wrapped object if the
+     *         method returns <code>void</code>, to be used for further
+     *         reflection.
+     * @throws ReflectException If any reflection exception occurred.
+     * @see #call(String, Object...)
+     */
+    public Reflect call(AccessibleObject method, Object... args) throws ReflectException {
+                Reflect newRef = on((Method)method, object, args);
+                newRef.setAccessibleObject(method);
+                return newRef;
+    }
     /**
      * Call a method by its name.
      * <p>
@@ -452,7 +543,9 @@ public class Reflect {
         // matching argument types
         try {
             Method method = exactMethod(name, types);
-            return on(method, object, args);
+            Reflect newRef = on(method, object, args);
+            newRef.setAccessibleObject(method);
+            return newRef;
         }
 
         // If there is no exact match, try to find a method that has a "similar"
@@ -460,7 +553,9 @@ public class Reflect {
         catch (NoSuchMethodException e) {
             try {
                 Method method = similarMethod(name, types);
-                return on(method, object, args);
+                Reflect newRef = on(method, object, args);
+                newRef.setAccessibleObject(method);
+                return newRef;
             } catch (NoSuchMethodException e1) {
                 throw new ReflectException(e1);
             }
@@ -885,6 +980,22 @@ public class Reflect {
 
         return type;
     }
+    
+    public AccessibleObject getAccessibleObject() {
+		return accessibleObject;
+	}
 
-    private static class NULL {}
+	public void setAccessibleObject(AccessibleObject accessibleObject) {
+		this.accessibleObject = accessibleObject;
+	}
+	public boolean isAccessibleObjectTypeMethod() {
+		return accessibleObject instanceof Method;
+	}
+
+	private static class NULL {}
+	public static class array extends AccessibleObject{
+		private final int index;
+		public array(int i) {index = i;}
+	}
+    private AccessibleObject accessibleObject;
 }
