@@ -21,6 +21,7 @@ import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.net.URI;
+import java.security.SecureClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,9 +45,10 @@ class Compile {
 
     static Class<?> compile(String className, String content) {
         Lookup lookup = MethodHandles.lookup();
+        ClassLoader cl = lookup.lookupClass().getClassLoader();
 
         try {
-            return lookup.lookupClass().getClassLoader().loadClass(className);
+            return cl.loadClass(className);
         }
         catch (ClassNotFoundException ignore) {
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -67,7 +69,6 @@ class Compile {
 
                 // This works if we have private-access to the interfaces in the class hierarchy
                 if (Reflect.CACHED_LOOKUP_CONSTRUCTOR != null) {
-                    ClassLoader cl = lookup.lookupClass().getClassLoader();
                     byte[] b = fileManager.o.getBytes();
                     result = Reflect.on(cl).call("defineClass", className, b, 0, b.length).get();
                 }
@@ -99,7 +100,7 @@ class Compile {
                     // Otherwise, use an arbitrary class loader. This approach doesn't allow for
                     // loading private-access interfaces in the compiled class's type hierarchy
                     else {
-                        result = new ClassLoader() {
+                        result = new ClassLoader(cl) {
                             @Override
                             protected Class<?> findClass(String name) throws ClassNotFoundException {
                                 byte[] b = fileManager.o.getBytes();
