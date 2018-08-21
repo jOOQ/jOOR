@@ -21,7 +21,6 @@ import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.net.URI;
-import java.security.SecureClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
