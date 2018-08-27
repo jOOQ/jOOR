@@ -15,23 +15,36 @@ package org.joor.test;
 
 /* [java-8] */
 
-import org.joor.Reflect;
-import org.joor.ReflectException;
-import org.joor.test.CompileTest.J;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.joor.Reflect;
+import org.joor.ReflectException;
+import org.joor.test.CompileTest.J;
+import org.junit.Test;
+import org.junit.validator.TestClassValidator;
 
 /**
  * @author Lukas Eder
  */
 public class CompileTest {
+
+    @Test
+    public void testCompileWithClasspathDependency() throws Exception {
+        TestClassValidator v = Reflect.compile("org.joor.test.TestClassValidatorImplementation",
+                "package org.joor.test; public class TestClassValidatorImplementation implements org.junit.validator.TestClassValidator {"
+              + "public java.util.List<Exception> validateTestClass(org.junit.runners.model.TestClass testClass) {"
+              + "return new java.util.ArrayList<>();"
+              + "}"
+              + "}").create().get();
+        assertEquals(new ArrayList<Object>(), v.validateTestClass(null));
+    }
 
     @Test
     public void testCompileLocalInterfaceHierarchy() throws Exception {
