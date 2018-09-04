@@ -590,4 +590,9 @@ public class ReflectTest {
         assertEquals(Test1.class, fields.get("I_DATA").type());
         assertNull(fields.get("I_DATA").get());
     }
+
+    @Test
+    public void testNullInstanceToString() {
+        assertEquals("null", Reflect.on((Object) null).toString());
+    }
 }

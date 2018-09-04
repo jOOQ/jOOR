@@ -743,7 +743,7 @@ public class Reflect {
      */
     @Override
     public String toString() {
-        return object.toString();
+        return String.valueOf(object);
     }
 
     // ---------------------------------------------------------------------
