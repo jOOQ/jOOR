@@ -1,6 +1,6 @@
 /* [java-9] */
 module org.jooq.joor {
-    requires static java.compiler;
+    requires static transitive java.compiler;
 
     exports org.joor;
 }
