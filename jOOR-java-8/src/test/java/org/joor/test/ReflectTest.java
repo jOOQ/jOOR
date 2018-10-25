@@ -595,4 +595,25 @@ public class ReflectTest {
     public void testNullInstanceToString() {
         assertEquals("null", Reflect.on((Object) null).toString());
     }
+
+    @Test
+    public void testInitValue() {
+        assertEquals((byte) 0, (byte) Reflect.initValue(byte.class));
+        assertEquals((short) 0, (short) Reflect.initValue(short.class));
+        assertEquals(0, (int) Reflect.initValue(int.class));
+        assertEquals(0L, (long) Reflect.initValue(long.class));
+        assertEquals(0.0, (double) Reflect.initValue(double.class));
+        assertEquals(0.0f, (float) Reflect.initValue(float.class));
+        assertEquals((char) 0, (char) Reflect.initValue(char.class));
+        assertEquals(false, (boolean) Reflect.initValue(boolean.class));
+        assertNull(Reflect.initValue(Object.class));
+        assertNull(Reflect.initValue(Byte.class));
+        assertNull(Reflect.initValue(Short.class));
+        assertNull(Reflect.initValue(Integer.class));
+        assertNull(Reflect.initValue(Long.class));
+        assertNull(Reflect.initValue(Double.class));
+        assertNull(Reflect.initValue(Float.class));
+        assertNull(Reflect.initValue(Character.class));
+        assertNull(Reflect.initValue(Boolean.class));
+    }
 }
