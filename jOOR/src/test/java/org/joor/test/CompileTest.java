@@ -137,6 +137,24 @@ public class CompileTest {
             return "J.m()";
         }
     }
+
+    @Test
+    public void testCompileNestedClass() {
+        Class<?> c =
+        Reflect.compile(
+            "org.joor.test.CompiledNestedClass",
+            "package org.joor.test;" +
+            "public class CompiledNestedClass {" +
+            "public class Inner {" +
+            "int foo() { return 42; }" +
+            "}" +
+            "Inner inner() { return new Inner(); }" +
+            "}")
+            .get();
+
+        int foo = Reflect.on(c).create().call("inner").call("foo").get();
+        assertEquals(42, foo);
+    }
 }
 
 interface I extends J {

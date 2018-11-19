@@ -13,7 +13,6 @@
  */
 package org.joor.test;
 
-import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.joor.Reflect.accessible;
 import static org.joor.Reflect.on;
@@ -21,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
@@ -602,8 +602,8 @@ public class ReflectTest {
         assertEquals((short) 0, (short) Reflect.initValue(short.class));
         assertEquals(0, (int) Reflect.initValue(int.class));
         assertEquals(0L, (long) Reflect.initValue(long.class));
-        assertEquals(0.0, (double) Reflect.initValue(double.class));
-        assertEquals(0.0f, (float) Reflect.initValue(float.class));
+        assertEquals(0.0, (double) Reflect.initValue(double.class), 0.0);
+        assertEquals(0.0f, (float) Reflect.initValue(float.class), 0.0f);
         assertEquals((char) 0, (char) Reflect.initValue(char.class));
         assertEquals(false, (boolean) Reflect.initValue(boolean.class));
         assertNull(Reflect.initValue(Object.class));
