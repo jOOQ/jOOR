@@ -26,9 +26,12 @@ import java.lang.invoke.MethodHandles.Lookup;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Map.Entry;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
@@ -90,15 +93,15 @@ class Compile {
 
                 task.call();
 
-                if (fileManager.o == null)
+                if (fileManager.isEmpty())
                     throw new ReflectException("Compilation error: " + out);
 
-                Class<?> result = null;
+                Class<?> result;
 
                 // This works if we have private-access to the interfaces in the class hierarchy
                 if (Reflect.CACHED_LOOKUP_CONSTRUCTOR != null) {
-                    byte[] b = fileManager.o.getBytes();
-                    result = Reflect.on(cl).call("defineClass", className, b, 0, b.length).get();
+                    result = fileManager.loadAndReturnMainClass(className,
+                        (name, bytes) -> Reflect.on(cl).call("defineClass", name, bytes, 0, bytes.length).get());
                 }
                 /* [java-9] */
 
@@ -126,15 +129,17 @@ class Compile {
                         //       The heuristic will work only with classes that follow standard naming conventions.
                         //       A better implementation is difficult at this point.
                         Character.isUpperCase(className.charAt(caller.getPackageName().length() + 1))) {
-                        result = MethodHandles
-                            .privateLookupIn(caller, lookup)
-                            .defineClass(fileManager.o.getBytes());
+                        Lookup privateLookup = MethodHandles.privateLookupIn(caller, lookup);
+                        result = fileManager.loadAndReturnMainClass(className,
+                            (name, bytes) -> privateLookup.defineClass(bytes));
                     }
 
                     // Otherwise, use an arbitrary class loader. This approach doesn't allow for
                     // loading private-access interfaces in the compiled class's type hierarchy
                     else {
-                        result = new ByteArrayClassLoader(className, fileManager.o.getBytes()).loadClass(className);
+                        ByteArrayClassLoader c = new ByteArrayClassLoader(fileManager.classes());
+                        result = fileManager.loadAndReturnMainClass(className,
+                            (name, bytes) -> c.loadClass(name));
                     }
                 }
                 /* [/java-9] */
@@ -152,17 +157,16 @@ class Compile {
 
     /* [java-9] */
     static final class ByteArrayClassLoader extends ClassLoader {
-        private final String className;
-        private final byte[] bytes;
+        private final Map<String, byte[]> classes;
 
-        ByteArrayClassLoader(String className, byte[] bytes) {
-            this.className = className;
-            this.bytes = bytes;
+        ByteArrayClassLoader(Map<String, byte[]> classes) {
+            this.classes = classes;
         }
 
         @Override
         protected Class<?> findClass(String name) {
-            return defineClass(className, bytes, 0, bytes.length);
+            byte[] bytes = classes.get(name);
+            return defineClass(name, bytes, 0, bytes.length);
         }
     }
     /* [/java-9] */
@@ -185,10 +189,13 @@ class Compile {
     }
 
     static final class ClassFileManager extends ForwardingJavaFileManager<StandardJavaFileManager> {
-        JavaFileObject o;
+        private final Map<String, JavaFileObject> fileObjectMap;
+        private Map<String, byte[]> classes;
 
         ClassFileManager(StandardJavaFileManager standardManager) {
             super(standardManager);
+
+            fileObjectMap = new HashMap<>();
         }
 
         @Override
@@ -198,8 +205,42 @@ class Compile {
             JavaFileObject.Kind kind,
             FileObject sibling
         ) {
-            return o = new JavaFileObject(className, kind);
+            JavaFileObject result = new JavaFileObject(className, kind);
+            fileObjectMap.put(className, result);
+            return result;
         }
+
+        boolean isEmpty() {
+            return fileObjectMap.isEmpty();
+        }
+
+        Map<String, byte[]> classes() {
+            if (classes == null) {
+                classes = new HashMap<>();
+
+                for (Entry<String, JavaFileObject> entry : fileObjectMap.entrySet())
+                    classes.put(entry.getKey(), entry.getValue().getBytes());
+            }
+
+            return classes;
+        }
+
+        Class<?> loadAndReturnMainClass(String mainClassName, ThrowingBiFunction<String, byte[], Class<?>> definer) throws Exception {
+            Class<?> result = null;
+
+            for (Entry<String, byte[]> entry : classes().entrySet()) {
+                Class<?> c = definer.apply(entry.getKey(), entry.getValue());
+                if (mainClassName.equals(entry.getKey()))
+                    result = c;
+            }
+
+            return result;
+        }
+    }
+
+    @FunctionalInterface
+    interface ThrowingBiFunction<T, U, R> {
+        R apply(T t, U u) throws Exception;
     }
 
     static final class CharSequenceJavaFileObject extends SimpleJavaFileObject {

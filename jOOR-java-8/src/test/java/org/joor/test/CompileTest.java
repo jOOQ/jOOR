@@ -155,6 +155,24 @@ public class CompileTest {
         int foo = Reflect.on(c).create().call("inner").call("foo").get();
         assertEquals(42, foo);
     }
+
+    @Test
+    public void testCompileTopLevelClasses() {
+        Class<?> c =
+        Reflect.compile(
+            "org.joor.test.CompileTopLevelClasses",
+            "package org.joor.test;" +
+            "public class CompileTopLevelClasses {" +
+            "Other other() { return new Other(); }" +
+            "}" +
+            "class Other {" +
+            "int foo() { return 42; }" +
+            "}")
+            .get();
+
+        int foo = Reflect.on(c).create().call("other").call("foo").get();
+        assertEquals(42, foo);
+    }
 }
 
 interface I extends J {
