@@ -119,7 +119,13 @@ class Compile {
 
                     // If the compiled class is in the same package as the caller class, then
                     // we can use the private-access Lookup of the caller class
-                    if (className.startsWith(caller.getPackageName() + ".")) {
+                    if (className.startsWith(caller.getPackageName() + ".") &&
+
+                        // [#74] This heuristic is necessary to prevent classes in subpackages of the caller to be loaded
+                        //       this way, as subpackages cannot access private content in super packages.
+                        //       The heuristic will work only with classes that follow standard naming conventions.
+                        //       A better implementation is difficult at this point.
+                        Character.isUpperCase(className.charAt(caller.getPackageName().length() + 1))) {
                         result = MethodHandles
                             .privateLookupIn(caller, lookup)
                             .defineClass(fileManager.o.getBytes());
@@ -130,7 +136,7 @@ class Compile {
                     else {
                         result = new ClassLoader() {
                             @Override
-                            protected Class<?> findClass(String name) throws ClassNotFoundException {
+                            protected Class<?> findClass(String name) {
                                 byte[] b = fileManager.o.getBytes();
                                 return defineClass(className, b, 0, b.length);
                             }
