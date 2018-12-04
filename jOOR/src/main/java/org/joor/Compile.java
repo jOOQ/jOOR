@@ -136,13 +136,7 @@ class Compile {
                     // Otherwise, use an arbitrary class loader. This approach doesn't allow for
                     // loading private-access interfaces in the compiled class's type hierarchy
                     else {
-                        result = new ClassLoader() {
-                            @Override
-                            protected Class<?> findClass(String name) {
-                                byte[] b = fileManager.o.getBytes();
-                                return defineClass(className, b, 0, b.length);
-                            }
-                        }.loadClass(className);
+                        result = new ByteArrayClassLoader(className, fileManager.o.getBytes()).loadClass(className);
                     }
                 }
                 /* [/java-9] */
@@ -157,6 +151,23 @@ class Compile {
             }
         }
     }
+
+    /* [java-9] */
+    static final class ByteArrayClassLoader extends ClassLoader {
+        private final String className;
+        private final byte[] bytes;
+
+        ByteArrayClassLoader(String className, byte[] bytes) {
+            this.className = className;
+            this.bytes = bytes;
+        }
+
+        @Override
+        protected Class<?> findClass(String name) {
+            return defineClass(className, bytes, 0, bytes.length);
+        }
+    }
+    /* [/java-9] */
 
     static final class JavaFileObject extends SimpleJavaFileObject {
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
