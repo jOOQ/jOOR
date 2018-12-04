@@ -28,21 +28,17 @@ import javax.annotation.processing.Processor;
 public final class CompileOptions {
 
     final List<? extends Processor> processors;
-    final ClassLoader classLoader;
 
     public CompileOptions() {
         this(
-            Collections.emptyList(),
-            null
+            Collections.emptyList()
         );
     }
 
     private CompileOptions(
-        List<? extends Processor> processors,
-        ClassLoader classLoader
+        List<? extends Processor> processors
     ) {
         this.processors = processors;
-        this.classLoader = classLoader;
     }
 
     public final CompileOptions processors(Processor... newProcessors) {
@@ -50,11 +46,7 @@ public final class CompileOptions {
     }
 
     public final CompileOptions processors(List<? extends Processor> newProcessors) {
-        return new CompileOptions(newProcessors, classLoader);
-    }
-
-    public final CompileOptions classLoader(ClassLoader newClassLoader) {
-        return new CompileOptions(processors, newClassLoader);
+        return new CompileOptions(newProcessors);
     }
 }
 /* [/java-8] */
