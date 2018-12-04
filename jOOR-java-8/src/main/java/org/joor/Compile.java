@@ -96,7 +96,7 @@ class Compile {
                 if (fileManager.isEmpty())
                     throw new ReflectException("Compilation error: " + out);
 
-                Class<?> result;
+                Class<?> result = null;
 
                 // This works if we have private-access to the interfaces in the class hierarchy
                 if (Reflect.CACHED_LOOKUP_CONSTRUCTOR != null) {
