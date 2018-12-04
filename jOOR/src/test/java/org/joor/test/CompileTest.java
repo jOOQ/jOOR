@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 import org.joor.Reflect;
 import org.joor.ReflectException;
 import org.joor.test.CompileTest.J;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.validator.TestClassValidator;
 
@@ -47,6 +48,7 @@ public class CompileTest {
     }
 
     @Test
+    @Ignore // [#77]
     public void testCompileLocalInterfaceHierarchy() throws Exception {
         I i = Reflect.compile("org.joor.test.CompileTest1", "package org.joor.test; public class CompileTest1 implements org.joor.test.I {}").create().get();
         assertEquals("I.m()", i.m());
