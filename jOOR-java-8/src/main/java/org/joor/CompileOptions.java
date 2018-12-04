@@ -13,9 +13,9 @@
  */
 package org.joor;
 
-import java.util.Arrays;
-
 /* [java-8] */
+
+import java.util.Arrays;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,23 +28,33 @@ import javax.annotation.processing.Processor;
 public final class CompileOptions {
 
     final List<? extends Processor> processors;
+    final ClassLoader classLoader;
 
     public CompileOptions() {
         this(
-            Collections.emptyList()
+            Collections.emptyList(),
+            null
         );
     }
 
-    private CompileOptions(List<? extends Processor> processors) {
+    private CompileOptions(
+        List<? extends Processor> processors,
+        ClassLoader classLoader
+    ) {
         this.processors = processors;
+        this.classLoader = classLoader;
     }
 
-    public CompileOptions processors(Processor... processors) {
-        return processors(Arrays.asList(processors));
+    public final CompileOptions processors(Processor... newProcessors) {
+        return processors(Arrays.asList(newProcessors));
     }
 
-    public CompileOptions processors(List<? extends Processor> processors) {
-        return new CompileOptions(processors);
+    public final CompileOptions processors(List<? extends Processor> newProcessors) {
+        return new CompileOptions(newProcessors, classLoader);
+    }
+
+    public final CompileOptions classLoader(ClassLoader newClassLoader) {
+        return new CompileOptions(processors, newClassLoader);
     }
 }
 /* [/java-8] */

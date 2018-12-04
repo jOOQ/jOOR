@@ -13,11 +13,13 @@
  */
 package org.joor.test;
 
+import java.io.Serializable;
 import java.util.Collections;
 
 /* [java-8] */
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 import javax.annotation.processing.Completion;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -34,10 +36,37 @@ import org.joor.Reflect;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Lukas Eder
  */
 public class CompileOptionsTest {
+
+    @Test
+    public void testCompileWithCustomClassLoader() throws Exception {
+        CompileOptions co = new CompileOptions().classLoader(new ClassLoader() {
+            @Override
+            protected Class<?> findClass(String name) {
+                return Object.class;
+            }
+        });
+
+        String className = "com.example.CompileWithCustomClassLoader";
+        String classCode =
+            "package com.example;\n" +
+            "class CompileWithCustomClassLoader implements java.io.Serializable {}\n";
+
+        Object o1 = Reflect.compile(className, classCode).create().get();
+        assertEquals(className, o1.getClass().getName());
+        assertTrue(o1 instanceof Serializable);
+
+        Object o2 = Reflect.compile(className, classCode, co).create().get();
+        assertEquals("java.lang.Object", o2.getClass().getName());
+        assertFalse(o2 instanceof Serializable);
+    }
 
     @Test
     public void testCompileWithAnnotationProcessors() throws Exception {
@@ -51,7 +80,7 @@ public class CompileOptionsTest {
             new CompileOptions().processors(p)
             ).create().get();
 
-        Assert.assertTrue(p.processed);
+        assertTrue(p.processed);
     }
 
     static class AProcessor implements Processor {
