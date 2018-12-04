@@ -46,7 +46,13 @@
                     <maxmem>512m</maxmem>
                     <meminitial>256m</meminitial>
                     <encoding>UTF-8</encoding>
-                    <release>8</release>
+
+
+
+
+
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <debug>true</debug>
                     <debuglevel>lines,vars,source</debuglevel>
                 </configuration>
