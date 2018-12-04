@@ -88,6 +88,7 @@ public class CompileTest {
     }
 
     @Test
+    @Ignore // [#76]
     public void testRecompileSameClassName() {
 
         // The class loader will cache the class name by default, so a new content shouldn't affect the type
