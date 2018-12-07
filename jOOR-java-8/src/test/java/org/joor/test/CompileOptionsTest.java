@@ -18,6 +18,7 @@ import java.util.Collections;
 
 /* [java-8] */
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -33,6 +34,7 @@ import javax.lang.model.element.TypeElement;
 
 import org.joor.CompileOptions;
 import org.joor.Reflect;
+import org.joor.ReflectException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -48,15 +50,30 @@ public class CompileOptionsTest {
     @Test
     public void testCompileWithAnnotationProcessors() throws Exception {
         AProcessor p = new AProcessor();
+
+        try {
+            Reflect.compile(
+                "org.joor.test.FailAnnotationProcessing",
+                "package org.joor.test; "
+              + "@A "
+              + "public class FailAnnotationProcessing {"
+              + "}",
+                new CompileOptions().processors(p)
+            ).create().get();
+            Assert.fail();
+        }
+        catch (ReflectException expected) {
+            assertFalse(p.processed);
+        }
+
         Reflect.compile(
-            "org.joor.test.CompileWithAnnotationProcessors",
+            "org.joor.test.SucceedAnnotationProcessing",
             "package org.joor.test; "
-          + "@A "
-          + "public class CompileWithAnnotationProcessors {"
+          + "@A @B "
+          + "public class SucceedAnnotationProcessing {"
           + "}",
             new CompileOptions().processors(p)
-            ).create().get();
-
+        ).create().get();
         assertTrue(p.processed);
     }
 
@@ -84,6 +101,12 @@ public class CompileOptionsTest {
 
         @Override
         public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+            for (TypeElement e1 : annotations)
+                if (e1.getQualifiedName().contentEquals(A.class.getName()))
+                    for (Element e2 : roundEnv.getElementsAnnotatedWith(e1))
+                        if (e2.getAnnotation(B.class) == null)
+                            throw new RuntimeException("Annotation A must be accompanied by annotation B");
+
             this.processed = true;
             return false;
         }
@@ -96,5 +119,6 @@ public class CompileOptionsTest {
 }
 
 @interface A {}
+@interface B {}
 
 /* [/java-8] */
