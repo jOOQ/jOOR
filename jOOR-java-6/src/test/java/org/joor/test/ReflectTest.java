@@ -16,6 +16,7 @@ package org.joor.test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.joor.Reflect.accessible;
 import static org.joor.Reflect.on;
+import static org.joor.Reflect.onClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -56,37 +57,41 @@ public class ReflectTest {
     }
 
     @Test
-    public void testOn() {
-        assertEquals(on(Object.class), on("java.lang.Object", ClassLoader.getSystemClassLoader()));
-        assertEquals(on(Object.class), on("java.lang.Object"));
-        assertEquals(on(Object.class).<Object>get(), on("java.lang.Object").get());
-        assertEquals(Object.class, on(Object.class).get());
-        assertEquals("abc", on((Object) "abc").get());
-        assertEquals(1, (int) (Integer) on(1).get());
+    public void testOnClass() {
+        assertEquals(onClass(Object.class), onClass("java.lang.Object", ClassLoader.getSystemClassLoader()));
+        assertEquals(onClass(Object.class), onClass("java.lang.Object"));
+        assertEquals(onClass(Object.class).<Object>get(), onClass("java.lang.Object").get());
 
         try {
-            on("asdf");
+            onClass("asdf");
             fail();
         }
         catch (ReflectException expected) {}
 
         try {
-            on("asdf", ClassLoader.getSystemClassLoader());
+            onClass("asdf", ClassLoader.getSystemClassLoader());
             fail();
         }
         catch (ReflectException expected) {}
     }
 
     @Test
+    public void testOnInstance() {
+        assertEquals(Object.class, onClass(Object.class).get());
+        assertEquals("abc", on((Object) "abc").get());
+        assertEquals(1, (int) (Integer) on(1).get());
+    }
+
+    @Test
     public void testConstructors() {
-        assertEquals("", on(String.class).create().get());
-        assertEquals("abc", on(String.class).create("abc").get());
-        assertEquals("abc", on(String.class).create("abc".getBytes()).get());
-        assertEquals("abc", on(String.class).create("abc".toCharArray()).get());
-        assertEquals("b", on(String.class).create("abc".toCharArray(), 1, 1).get());
+        assertEquals("", onClass(String.class).create().get());
+        assertEquals("abc", onClass(String.class).create("abc").get());
+        assertEquals("abc", onClass(String.class).create("abc".getBytes()).get());
+        assertEquals("abc", onClass(String.class).create("abc".toCharArray()).get());
+        assertEquals("b", onClass(String.class).create("abc".toCharArray(), 1, 1).get());
 
         try {
-            on(String.class).create(new Object());
+            onClass(String.class).create(new Object());
             fail();
         }
         catch (ReflectException expected) {}
@@ -94,8 +99,8 @@ public class ReflectTest {
 
     @Test
     public void testPrivateConstructor() {
-        assertNull(on(PrivateConstructors.class).create().get("string"));
-        assertEquals("abc", on(PrivateConstructors.class).create("abc").get("string"));
+        assertNull(onClass(PrivateConstructors.class).create().get("string"));
+        assertEquals("abc", onClass(PrivateConstructors.class).create("abc").get("string"));
     }
 
     @Test
@@ -105,23 +110,23 @@ public class ReflectTest {
 
         Test2 test;
 
-        test = on(Test2.class).create().get();
+        test = onClass(Test2.class).create().get();
         assertEquals(null, test.n);
         assertEquals(ConstructorType.NO_ARGS, test.constructorType);
 
-        test = on(Test2.class).create("abc").get();
+        test = onClass(Test2.class).create("abc").get();
         assertEquals("abc", test.n);
         assertEquals(ConstructorType.OBJECT, test.constructorType);
 
-        test = on(Test2.class).create(1L).get();
+        test = onClass(Test2.class).create(1L).get();
         assertEquals(1L, test.n);
         assertEquals(ConstructorType.NUMBER, test.constructorType);
 
-        test = on(Test2.class).create(1).get();
+        test = onClass(Test2.class).create(1).get();
         assertEquals(1, test.n);
         assertEquals(ConstructorType.INTEGER, test.constructorType);
 
-        test = on(Test2.class).create('a').get();
+        test = onClass(Test2.class).create('a').get();
         assertEquals('a', test.n);
         assertEquals(ConstructorType.OBJECT, test.constructorType);
     }
@@ -142,11 +147,11 @@ public class ReflectTest {
 
         // Static methods
         // --------------
-        assertEquals("true", on(String.class).call("valueOf", true).get());
-        assertEquals("1", on(String.class).call("valueOf", 1).get());
-        assertEquals("abc", on(String.class).call("valueOf", "abc".toCharArray()).get());
-        assertEquals("abc", on(String.class).call("copyValueOf", "abc".toCharArray()).get());
-        assertEquals("b", on(String.class).call("copyValueOf", "abc".toCharArray(), 1, 1).get());
+        assertEquals("true", onClass(String.class).call("valueOf", true).get());
+        assertEquals("1", onClass(String.class).call("valueOf", 1).get());
+        assertEquals("abc", onClass(String.class).call("valueOf", "abc".toCharArray()).get());
+        assertEquals("abc", onClass(String.class).call("copyValueOf", "abc".toCharArray()).get());
+        assertEquals("b", onClass(String.class).call("copyValueOf", "abc".toCharArray(), 1, 1).get());
     }
 
     @Test
@@ -158,7 +163,7 @@ public class ReflectTest {
 
         // Static methods
         // --------------
-        assertEquals(Test4.class, on(Test4.class).call("s_method").get());
+        assertEquals(Test4.class, onClass(Test4.class).call("s_method").get());
     }
 
     @Test
@@ -170,7 +175,7 @@ public class ReflectTest {
 
         // Static methods
         // --------------
-        assertEquals(Test8.class, on(Test8.class).call("s_method").get());
+        assertEquals(Test8.class, onClass(Test8.class).call("s_method").get());
 
     }
 
@@ -214,23 +219,23 @@ public class ReflectTest {
 
         Test3 test;
 
-        test = on(Test3.class).create().call("method").get();
+        test = onClass(Test3.class).create().call("method").get();
         assertEquals(null, test.n);
         assertEquals(MethodType.NO_ARGS, test.methodType);
 
-        test = on(Test3.class).create().call("method", "abc").get();
+        test = onClass(Test3.class).create().call("method", "abc").get();
         assertEquals("abc", test.n);
         assertEquals(MethodType.OBJECT, test.methodType);
 
-        test = on(Test3.class).create().call("method", 1L).get();
+        test = onClass(Test3.class).create().call("method", 1L).get();
         assertEquals(1L, test.n);
         assertEquals(MethodType.NUMBER, test.methodType);
 
-        test = on(Test3.class).create().call("method", 1).get();
+        test = onClass(Test3.class).create().call("method", 1).get();
         assertEquals(1, test.n);
         assertEquals(MethodType.INTEGER, test.methodType);
 
-        test = on(Test3.class).create().call("method", 'a').get();
+        test = onClass(Test3.class).create().call("method", 'a').get();
         assertEquals('a', test.n);
         assertEquals(MethodType.OBJECT, test.methodType);
     }
@@ -249,12 +254,12 @@ public class ReflectTest {
 
         // Static methods
         // --------------
-        assertEquals(1, (int) (Integer) on(Test1.class).set("S_INT1", 1).get("S_INT1"));
-        assertEquals(1, (int) (Integer) on(Test1.class).field("S_INT1").get());
-        assertEquals(1, (int) (Integer) on(Test1.class).set("S_INT2", 1).get("S_INT2"));
-        assertEquals(1, (int) (Integer) on(Test1.class).field("S_INT2").get());
-        assertNull(on(Test1.class).set("S_INT2", null).get("S_INT2"));
-        assertNull(on(Test1.class).field("S_INT2").get());
+        assertEquals(1, (int) (Integer) onClass(Test1.class).set("S_INT1", 1).get("S_INT1"));
+        assertEquals(1, (int) (Integer) onClass(Test1.class).field("S_INT1").get());
+        assertEquals(1, (int) (Integer) onClass(Test1.class).set("S_INT2", 1).get("S_INT2"));
+        assertEquals(1, (int) (Integer) onClass(Test1.class).field("S_INT2").get());
+        assertNull(onClass(Test1.class).set("S_INT2", null).get("S_INT2"));
+        assertNull(onClass(Test1.class).field("S_INT2").get());
 
         // Hierarchies
         // -----------
@@ -298,13 +303,13 @@ public class ReflectTest {
 
             // Static methods
             // ----------------
-            assertEquals(1, (int) (Integer) on(Test11.class).set("SF_INT1", 1).get("SF_INT1"));
-            assertEquals(1, (int) (Integer) on(Test11.class).field("SF_INT1").get());
-            assertEquals(1, (int) (Integer) on(Test11.class).set("SF_INT2", 1).get("SF_INT2"));
-            assertEquals(1, (int) (Integer) on(Test11.class).field("SF_INT2").get());
-            on(Test11.class).set("SF_INT2", 1).field("SF_INT2").get();
-            assertNull(on(Test11.class).set("SF_INT2", null).get("SF_INT2"));
-            assertNull(on(Test11.class).field("SF_INT2").get());
+            assertEquals(1, (int) (Integer) onClass(Test11.class).set("SF_INT1", 1).get("SF_INT1"));
+            assertEquals(1, (int) (Integer) onClass(Test11.class).field("SF_INT1").get());
+            assertEquals(1, (int) (Integer) onClass(Test11.class).set("SF_INT2", 1).get("SF_INT2"));
+            assertEquals(1, (int) (Integer) onClass(Test11.class).field("SF_INT2").get());
+            onClass(Test11.class).set("SF_INT2", 1).field("SF_INT2").get();
+            assertNull(onClass(Test11.class).set("SF_INT2", null).get("SF_INT2"));
+            assertNull(onClass(Test11.class).field("SF_INT2").get());
         }
         catch (ReflectException e) {
 
@@ -317,9 +322,9 @@ public class ReflectTest {
     @Test
     public void testFinalFieldAdvanced() {
         try {
-            on(Test11.class).set("S_DATA", on(Test11.class).create())
+            onClass(Test11.class).set("S_DATA", onClass(Test11.class).create())
                     .field("S_DATA")
-                    .set("I_DATA", on(Test11.class).create())
+                    .set("I_DATA", onClass(Test11.class).create())
                     .field("I_DATA")
                     .set("F_INT1", 1)
                     .set("F_INT2", 1)
@@ -343,7 +348,7 @@ public class ReflectTest {
     @Test
     @Ignore
     public void testPrivateStaticFinal() {
-        Reflect reflect = on(TestPrivateStaticFinal.class);
+        Reflect reflect = onClass(TestPrivateStaticFinal.class);
 
         assertEquals(Integer.valueOf(1), reflect.get("I1"));
         assertEquals(Integer.valueOf(1), reflect.get("I2"));
@@ -374,17 +379,17 @@ public class ReflectTest {
 
         // Static methods
         // --------------
-        assertEquals(3, on(Test1.class).fields().size());
-        assertTrue(on(Test1.class).fields().containsKey("S_INT1"));
-        assertTrue(on(Test1.class).fields().containsKey("S_INT2"));
-        assertTrue(on(Test1.class).fields().containsKey("S_DATA"));
+        assertEquals(3, onClass(Test1.class).fields().size());
+        assertTrue(onClass(Test1.class).fields().containsKey("S_INT1"));
+        assertTrue(onClass(Test1.class).fields().containsKey("S_INT2"));
+        assertTrue(onClass(Test1.class).fields().containsKey("S_DATA"));
 
-        assertEquals(1, (int) (Integer) on(Test1.class).set("S_INT1", 1).fields().get("S_INT1").get());
-        assertEquals(1, (int) (Integer) on(Test1.class).fields().get("S_INT1").get());
-        assertEquals(1, (int) (Integer) on(Test1.class).set("S_INT2", 1).fields().get("S_INT2").get());
-        assertEquals(1, (int) (Integer) on(Test1.class).fields().get("S_INT2").get());
-        assertNull(on(Test1.class).set("S_INT2", null).fields().get("S_INT2").get());
-        assertNull(on(Test1.class).fields().get("S_INT2").get());
+        assertEquals(1, (int) (Integer) onClass(Test1.class).set("S_INT1", 1).fields().get("S_INT1").get());
+        assertEquals(1, (int) (Integer) onClass(Test1.class).fields().get("S_INT1").get());
+        assertEquals(1, (int) (Integer) onClass(Test1.class).set("S_INT2", 1).fields().get("S_INT2").get());
+        assertEquals(1, (int) (Integer) onClass(Test1.class).fields().get("S_INT2").get());
+        assertNull(onClass(Test1.class).set("S_INT2", null).fields().get("S_INT2").get());
+        assertNull(onClass(Test1.class).fields().get("S_INT2").get());
 
         // Hierarchies
         // -----------
@@ -400,9 +405,9 @@ public class ReflectTest {
 
     @Test
     public void testFieldAdvanced() {
-        on(Test1.class).set("S_DATA", on(Test1.class).create())
+        onClass(Test1.class).set("S_DATA", onClass(Test1.class).create())
                       .field("S_DATA")
-                      .set("I_DATA", on(Test1.class).create())
+                      .set("I_DATA", onClass(Test1.class).create())
                       .field("I_DATA")
                       .set("I_INT1", 1)
                       .set("S_INT1", 2);
@@ -490,14 +495,14 @@ public class ReflectTest {
     @Test
     public void testType() throws Exception {
         assertEquals(Object.class, on(new Object()).type());
-        assertEquals(Object.class, on(Object.class).type());
+        assertEquals(Object.class, onClass(Object.class).type());
         assertEquals(Integer.class, on(1).type());
-        assertEquals(Integer.class, on(Integer.class).type());
+        assertEquals(Integer.class, onClass(Integer.class).type());
     }
 
     @Test
     public void testCreateWithNulls() throws Exception {
-        Test2 test2 = on(Test2.class).create((Object) null).<Test2>get();
+        Test2 test2 = onClass(Test2.class).create((Object) null).<Test2>get();
         assertNull(test2.n);
         // Can we make any assertions about the actual construct being called?
         // assertEquals(Test2.ConstructorType.OBJECT, test2.constructorType);
@@ -505,15 +510,15 @@ public class ReflectTest {
 
     @Test
     public void testCreateWithPrivateConstructor() throws Exception {
-        Test10 t1 = on(Test10.class).create(1).get();
+        Test10 t1 = onClass(Test10.class).create(1).get();
         assertEquals(1, (int) t1.i);
         assertNull(t1.s);
 
-        Test10 t2 = on(Test10.class).create("a").get();
+        Test10 t2 = onClass(Test10.class).create("a").get();
         assertNull(t2.i);
         assertEquals("a", t2.s);
 
-        Test10 t3 = on(Test10.class).create("a", 1).get();
+        Test10 t3 = onClass(Test10.class).create("a", 1).get();
         assertEquals(1, (int) t3.i);
         assertEquals("a", t3.s);
     }
@@ -567,7 +572,7 @@ public class ReflectTest {
 
     @Test
     public void testNullStaticFieldType() {
-        Map<String, Reflect> fields = Reflect.on(Test1.class).fields();
+        Map<String, Reflect> fields = Reflect.onClass(Test1.class).fields();
 
         assertEquals(3, fields.size());
         assertEquals(int.class, fields.get("S_INT1").type());

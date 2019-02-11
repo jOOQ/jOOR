@@ -155,7 +155,7 @@ public class CompileTest {
             "}")
             .get();
 
-        int foo = Reflect.on(c).create().call("inner").call("foo").get();
+        int foo = Reflect.onClass(c).create().call("inner").call("foo").get();
         assertEquals(42, foo);
     }
 
@@ -173,7 +173,7 @@ public class CompileTest {
             "}")
             .get();
 
-        int foo = Reflect.on(c).create().call("other").call("foo").get();
+        int foo = Reflect.onClass(c).create().call("other").call("foo").get();
         assertEquals(42, foo);
     }
 }
