@@ -77,6 +77,27 @@ public class CompileOptionsTest {
         assertTrue(p.processed);
     }
 
+    @Test
+    public void testCompileWithExtraOptions() {
+        Class<?> source7Class = Reflect.compile(
+            "org.joor.test.Source7",
+            "package org.joor.test; "
+                + "public class Source7 {"
+                + "}",
+            new CompileOptions().extraOptions("-source", "7")).create().get().getClass();
+
+        // todo: check .class version, or create better test for extraOptions
+
+        Class<?> source8Class = Reflect.compile(
+            "org.joor.test.Source8",
+            "package org.joor.test; "
+                + "public class Source8 {"
+                + "}",
+            new CompileOptions().extraOptions("-source", "8")).create().get().getClass();
+
+        // todo: check .class version, or create better test for extraOptions
+    }
+
     static class AProcessor implements Processor {
         boolean processed;
 
