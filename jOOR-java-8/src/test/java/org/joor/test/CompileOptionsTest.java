@@ -41,6 +41,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Lukas Eder
@@ -96,6 +97,18 @@ public class CompileOptionsTest {
             new CompileOptions().extraOptions("-source", "8")).create().get().getClass();
 
         // todo: check .class version, or create better test for extraOptions
+
+        try {
+            Reflect.compile(
+                "org.joor.test.Invalid",
+                "package org.joor.test; "
+                    + "public class Invalid {"
+                    + "}",
+                new CompileOptions().extraOptions("-invalidflag"));
+            fail("Expected ReflectException for -invalidflag");
+        } catch (ReflectException e) {
+            assertTrue(e.getCause() instanceof IllegalArgumentException);
+        }
     }
 
     static class AProcessor implements Processor {
