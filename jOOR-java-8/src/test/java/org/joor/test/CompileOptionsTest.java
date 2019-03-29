@@ -38,15 +38,75 @@ import org.joor.ReflectException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author Lukas Eder
  */
 public class CompileOptionsTest {
+
+    @Test
+    public void testCompileWithExtraOptions() {
+        assertEquals("org.joor.test.Source7OK", Reflect.compile(
+            "org.joor.test.Source7OK",
+            "package org.joor.test; "
+                + "public class Source7OK {"
+                + "}",
+            new CompileOptions().options("-source", "7")
+        ).type().getName());
+
+        try {
+            Reflect.compile(
+                "org.joor.test.Source7NOK",
+                "package org.joor.test; "
+                    + "public interface Source7NOK {"
+                    + "    default void m() {}"
+                    + "}",
+                new CompileOptions().options("-source", "7")
+            ).type();
+
+            fail("Class should not compile with source level 7");
+        }
+        catch (ReflectException expected) {}
+
+        assertEquals("org.joor.test.Source8OK", Reflect.compile(
+            "org.joor.test.Source8OK",
+            "package org.joor.test; "
+                + "public interface Source8OK {"
+                + "    default void m() {}"
+                + "}",
+            new CompileOptions().options("-source", "8")
+        ).type().getName());
+
+        try {
+            Reflect.compile(
+                "org.joor.test.Source8NOK",
+                "package org.joor.test; "
+                    + "public interface Source8NOK {"
+                    + "    private void m() {}"
+                    + "}",
+                new CompileOptions().options("-source", "8")
+            ).create().get();
+
+            fail("Class should not compile with source level 8");
+        }
+        catch (ReflectException expected) {}
+
+        try {
+            Reflect.compile(
+                "org.joor.test.Invalid",
+                "package org.joor.test; "
+                    + "public class Invalid {"
+                    + "}",
+                new CompileOptions().options("-invalidflag")
+            );
+
+            fail("Expected ReflectException for -invalidflag");
+        }
+        catch (ReflectException expected) {
+            assertTrue(expected.getCause() instanceof IllegalArgumentException);
+        }
+    }
 
     @Test
     public void testCompileWithAnnotationProcessors() throws Exception {
@@ -61,7 +121,8 @@ public class CompileOptionsTest {
               + "}",
                 new CompileOptions().processors(p)
             ).create().get();
-            Assert.fail();
+
+            fail("Expected ReflectException for bad annotation");
         }
         catch (ReflectException expected) {
             assertFalse(p.processed);
@@ -76,39 +137,6 @@ public class CompileOptionsTest {
             new CompileOptions().processors(p)
         ).create().get();
         assertTrue(p.processed);
-    }
-
-    @Test
-    public void testCompileWithExtraOptions() {
-        Class<?> source7Class = Reflect.compile(
-            "org.joor.test.Source7",
-            "package org.joor.test; "
-                + "public class Source7 {"
-                + "}",
-            new CompileOptions().extraOptions("-source", "7")).create().get().getClass();
-
-        // todo: check .class version, or create better test for extraOptions
-
-        Class<?> source8Class = Reflect.compile(
-            "org.joor.test.Source8",
-            "package org.joor.test; "
-                + "public class Source8 {"
-                + "}",
-            new CompileOptions().extraOptions("-source", "8")).create().get().getClass();
-
-        // todo: check .class version, or create better test for extraOptions
-
-        try {
-            Reflect.compile(
-                "org.joor.test.Invalid",
-                "package org.joor.test; "
-                    + "public class Invalid {"
-                    + "}",
-                new CompileOptions().extraOptions("-invalidflag"));
-            fail("Expected ReflectException for -invalidflag");
-        } catch (ReflectException e) {
-            assertTrue(e.getCause() instanceof IllegalArgumentException);
-        }
     }
 
     static class AProcessor implements Processor {

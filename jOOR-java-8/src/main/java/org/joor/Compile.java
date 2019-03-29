@@ -63,30 +63,32 @@ class Compile {
             try {
                 ClassFileManager fileManager = new ClassFileManager(compiler.getStandardFileManager(null, null, null));
 
-                List<CharSequenceJavaFileObject> files = new ArrayList<CharSequenceJavaFileObject>();
+                List<CharSequenceJavaFileObject> files = new ArrayList<>();
                 files.add(new CharSequenceJavaFileObject(className, content));
                 StringWriter out = new StringWriter();
 
-                List<String> options = new ArrayList<String>();
-                StringBuilder classpath = new StringBuilder();
-                String separator = System.getProperty("path.separator");
-                String prop = System.getProperty("java.class.path");
+                List<String> options = new ArrayList<>(compileOptions.options);
+                if (!options.contains("-classpath")) {
+                    StringBuilder classpath = new StringBuilder();
+                    String separator = System.getProperty("path.separator");
+                    String prop = System.getProperty("java.class.path");
 
-                if (prop != null && !"".equals(prop))
-                    classpath.append(prop);
+                    if (prop != null && !"".equals(prop))
+                        classpath.append(prop);
 
-                if (cl instanceof URLClassLoader) {
-                    for (URL url : ((URLClassLoader) cl).getURLs()) {
-                        if (classpath.length() > 0)
-                            classpath.append(separator);
+                    if (cl instanceof URLClassLoader) {
+                        for (URL url : ((URLClassLoader) cl).getURLs()) {
+                            if (classpath.length() > 0)
+                                classpath.append(separator);
 
-                        if ("file".equals(url.getProtocol()))
-                            classpath.append(new File(url.getFile()));
+                            if ("file".equals(url.getProtocol()))
+                                classpath.append(new File(url.getFile()));
+                        }
                     }
+
+                    options.addAll(Arrays.asList("-classpath", classpath.toString()));
                 }
 
-                options.addAll(Arrays.asList("-classpath", classpath.toString()));
-                options.addAll(compileOptions.extraOptions);
                 CompilationTask task = compiler.getTask(out, fileManager, null, options, null, files);
 
                 if (!compileOptions.processors.isEmpty())
