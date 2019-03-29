@@ -86,6 +86,7 @@ class Compile {
                 }
 
                 options.addAll(Arrays.asList("-classpath", classpath.toString()));
+                options.addAll(compileOptions.extraOptions);
                 CompilationTask task = compiler.getTask(out, fileManager, null, options, null, files);
 
                 if (!compileOptions.processors.isEmpty())
