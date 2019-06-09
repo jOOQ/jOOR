@@ -720,6 +720,18 @@ public class Reflect {
      */
     @SuppressWarnings("unchecked")
     public <P> P as(final Class<P> proxyType) {
+        return as(proxyType, proxyType.getClassLoader());
+    }
+
+    /**
+     * Create a proxy for the wrapped object allowing to typesafely invoke
+     * methods on it using a custom interface
+     *
+     * @param proxyType The interface type that is implemented by the proxy
+     * @return A proxy for the wrapped object
+     */
+    @SuppressWarnings("unchecked")
+    public <P> P as(final Class<P> proxyType, ClassLoader classLoader) {
         final boolean isMap = (object instanceof Map);
         final InvocationHandler handler = new InvocationHandler() {
             @Override
@@ -779,7 +791,7 @@ public class Reflect {
             }
         };
 
-        return (P) Proxy.newProxyInstance(proxyType.getClassLoader(), new Class[] { proxyType }, handler);
+        return (P) Proxy.newProxyInstance(classLoader, new Class[] { proxyType }, handler);
     }
 
     /**
