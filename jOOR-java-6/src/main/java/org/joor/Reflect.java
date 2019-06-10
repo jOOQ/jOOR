@@ -744,7 +744,7 @@ public class Reflect {
                     if (proxy instanceof ProxyValueConverter) {
                         return ((ProxyValueConverter) proxy).convert(name, on(type, object).call(name, args).get());
                     } else {
-                        return name, on(type, object).call(name, args).get();
+                        return on(type, object).call(name, args).get();
                     }
                 }
 
