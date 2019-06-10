@@ -720,11 +720,7 @@ public class Reflect {
      */
     @SuppressWarnings("unchecked")
     public <P> P as(final Class<P> proxyType) {
-        return as(proxyType, proxyType.getClassLoader(), new ProxyValueConverter() {
-            public Object convert(String name, Object object) {
-                return object;
-            }
-        });
+        return as(proxyType, proxyType.getClassLoader());
     }
 
     /**
@@ -735,7 +731,7 @@ public class Reflect {
      * @return A proxy for the wrapped object
      */
     @SuppressWarnings("unchecked")
-    public <P> P as(final Class<P> proxyType, ClassLoader classLoader, final ProxyValueConverter proxyValueConverter) {
+    public <P> P as(final Class<P> proxyType, ClassLoader classLoader) {
         final boolean isMap = (object instanceof Map);
         final InvocationHandler handler = new InvocationHandler() {
             @Override
@@ -745,7 +741,11 @@ public class Reflect {
 
                 // Actual method name matches always come first
                 try {
-                    return proxyValueConverter.convert(name, on(type, object).call(name, args).get());
+                    if (proxy instanceof ProxyValueConverter) {
+                        return ((ProxyValueConverter) proxy).convert(name, on(type, object).call(name, args).get());
+                    } else {
+                        return name, on(type, object).call(name, args).get();
+                    }
                 }
 
                 // [#14] Emulate POJO behaviour on wrapped map objects
