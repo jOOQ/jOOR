@@ -720,7 +720,11 @@ public class Reflect {
      */
     @SuppressWarnings("unchecked")
     public <P> P as(final Class<P> proxyType) {
-        return as(proxyType, proxyType.getClassLoader(), (name, object) -> object);
+        return as(proxyType, proxyType.getClassLoader(), new ProxyValueConverter() {
+            public Object convert(String name, Object object) {
+                return object;
+            }
+        });
     }
 
     /**
