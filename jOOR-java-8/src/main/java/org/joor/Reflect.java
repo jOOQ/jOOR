@@ -1008,7 +1008,7 @@ public class Reflect {
 
     private static class NULL {}
 
-    public static interface ProxyValueConverter {
+    public interface ProxyValueConverter {
         Object convert(String name, Object object);
     }
 }
