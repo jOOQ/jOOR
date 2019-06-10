@@ -741,8 +741,8 @@ public class Reflect {
 
                 // Actual method name matches always come first
                 try {
-                    if (proxy instanceof ProxyValueConverter) {
-                        return ((ProxyValueConverter) proxy).convert(name, on(type, object).call(name, args).get());
+                    if (proxy instanceof ProxyValueConverter && !"convertProxyValue".equals(name)) {
+                        return ((ProxyValueConverter) proxy).convertProxyValue(name, on(type, object).call(name, args).get());
                     } else {
                         return on(type, object).call(name, args).get();
                     }
@@ -1013,6 +1013,6 @@ public class Reflect {
     private static class NULL {}
 
     public interface ProxyValueConverter {
-        Object convert(String name, Object object);
+        Object convertProxyValue(String name, Object object);
     }
 }
