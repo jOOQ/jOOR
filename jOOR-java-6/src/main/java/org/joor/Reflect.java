@@ -1032,7 +1032,7 @@ public class Reflect {
     public interface ProxyArgumentsConverter {
         void convertArguments(String name, Object[] args);
     }
-    public abstract class ProxyInvocationHandler implements InvocationHandler {
+    public abstract static class ProxyInvocationHandler implements InvocationHandler {
         private Object underlyingObject;
 
         public void setUnderlyingObject(Object underlyingObject) {
