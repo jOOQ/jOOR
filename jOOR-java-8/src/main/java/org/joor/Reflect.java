@@ -807,7 +807,7 @@ public class Reflect {
         };
 
         Object instance = Proxy.newProxyInstance(classLoader, new Class[] { proxyType }, handler);
-        ((ProxyInvocationHandler) Proxy.getInvocationHandler(instance)).setUnderlyingObject(instance);
+        ((ProxyInvocationHandler) Proxy.getInvocationHandler(instance)).setUnderlyingObject(object);
         return (P) instance;
     }
 
