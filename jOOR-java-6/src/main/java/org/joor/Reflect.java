@@ -743,7 +743,7 @@ public class Reflect {
                 try {
                     if (proxy instanceof ProxyObject) {
                         return ((ProxyValueConverter) on(proxy).field("PROXY_VALUE_CONVERTER").get())
-                                .convertProxyValue(name, on(type, object).call(name, args).get());
+                                .convertProxyValue(name, on(type, object).call(name, args).get(), args);
                     } else {
                         return on(type, object).call(name, args).get();
                     }
@@ -1016,6 +1016,6 @@ public class Reflect {
     public interface ProxyObject {
     }
     public interface ProxyValueConverter {
-        Object convertProxyValue(String name, Object object);
+        Object convertProxyValue(String name, Object object, Object[] args);
     }
 }
