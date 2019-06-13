@@ -728,7 +728,7 @@ public class Reflect {
      */
     @SuppressWarnings("unchecked")
     public <P> P as(final Class<P> proxyType) {
-        return as(proxyType, proxyType.getClassLoader(), (name, object) -> object);
+        return as(proxyType, proxyType.getClassLoader());
     }
 
     /**
@@ -739,7 +739,7 @@ public class Reflect {
      * @return A proxy for the wrapped object
      */
     @SuppressWarnings("unchecked")
-    public <P> P as(final Class<P> proxyType, ClassLoader classLoader, ProxyValueConverter proxyValueConverter) {
+    public <P> P as(final Class<P> proxyType, ClassLoader classLoader) {
         final boolean isMap = (object instanceof Map);
         final InvocationHandler handler = new InvocationHandler() {
             @Override
