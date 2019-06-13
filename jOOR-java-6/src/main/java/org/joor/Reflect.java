@@ -745,7 +745,6 @@ public class Reflect {
             @Override
             @SuppressWarnings("null")
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                setUnderlyingObject(proxy);
                 String name = method.getName();
 
                 // Actual method name matches always come first
@@ -807,7 +806,9 @@ public class Reflect {
             }
         };
 
-        return (P) Proxy.newProxyInstance(classLoader, new Class[] { proxyType }, handler);
+        Object instance = Proxy.newProxyInstance(classLoader, new Class[] { proxyType }, handler);
+        ((ProxyInvocationHandler) Proxy.getInvocationHandler(instance)).setUnderlyingObject(instance);
+        return (P) instance;
     }
 
     /**
