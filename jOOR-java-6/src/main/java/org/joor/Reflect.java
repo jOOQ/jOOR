@@ -1032,7 +1032,7 @@ public class Reflect {
     public interface ProxyObject {
     }
     public interface ProxyValueConverter {
-        Object convertValue(String name, Object object, Object[] args);
+        Object convertValue(String name, Object object);
     }
     public interface ProxyArgumentsConverter {
         void convertArguments(String name, Object[] args);
