@@ -741,10 +741,11 @@ public class Reflect {
     @SuppressWarnings("unchecked")
     public <P> P as(final Class<P> proxyType, ClassLoader classLoader) {
         final boolean isMap = (object instanceof Map);
-        final InvocationHandler handler = new InvocationHandler() {
+        final InvocationHandler handler = new ProxyInvocationHandler() {
             @Override
             @SuppressWarnings("null")
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                setUnderlyingObject(proxy);
                 String name = method.getName();
 
                 // Actual method name matches always come first
@@ -1029,5 +1030,16 @@ public class Reflect {
     }
     public interface ProxyArgumentsConverter {
         void convertArguments(String name, Object[] args);
+    }
+    public abstract class ProxyInvocationHandler implements InvocationHandler {
+        private Object underlyingObject;
+
+        public void setUnderlyingObject(Object underlyingObject) {
+            this.underlyingObject = underlyingObject;
+        }
+
+        public Object getUnderlyingObject() {
+            return underlyingObject;
+        }
     }
 }
