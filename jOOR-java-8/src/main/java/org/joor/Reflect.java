@@ -741,7 +741,12 @@ public class Reflect {
 
                 // Actual method name matches always come first
                 try {
-                    return proxyValueConverter.convert(name, on(type, object).call(name, args).get());
+                    if (proxy instanceof ProxyObject) {
+                        return ((ProxyValueConverter) on(proxy).field("PROXY_VALUE_CONVERTER").get())
+                                .convertProxyValue(name, on(type, object).call(name, args).get(), args);
+                    } else {
+                        return on(type, object).call(name, args).get();
+                    }
                 }
 
                 // [#14] Emulate POJO behaviour on wrapped map objects
@@ -1007,8 +1012,9 @@ public class Reflect {
     }
 
     private static class NULL {}
-
+    public interface ProxyObject {
+    }
     public interface ProxyValueConverter {
-        Object convert(String name, Object object);
+        Object convertProxyValue(String name, Object object, Object[] args);
     }
 }
