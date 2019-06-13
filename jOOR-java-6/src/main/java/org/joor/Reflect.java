@@ -756,7 +756,7 @@ public class Reflect {
                         }
                         ProxyValueConverter valueConverter = on(proxy).field("PROXY_VALUE_CONVERTER").get();
                         if (valueConverter != null) {
-                            valueConverter.convertValue(name, on(type, object).call(name, args).get());
+                            return valueConverter.convertValue(name, on(type, object).call(name, args).get());
                         } else {
                             return on(type, object).call(name, args).get();
                         }
