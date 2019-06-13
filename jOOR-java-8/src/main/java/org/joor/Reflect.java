@@ -637,6 +637,13 @@ public class Reflect {
         }
         while (t != null);
 
+        // search by name alone
+        for (Method method : t.getMethods()) {
+            if (method.getName().equals(name)) {
+                return method;
+            }
+        }
+
         throw new NoSuchMethodException("No similar method " + name + " with params " + Arrays.toString(types) + " could be found on type " + type() + ".");
     }
 
