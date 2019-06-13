@@ -638,6 +638,7 @@ public class Reflect {
         while (t != null);
 
         // search by name alone
+        t = type();
         for (Method method : t.getMethods()) {
             if (method.getName().equals(name)) {
                 return method;
