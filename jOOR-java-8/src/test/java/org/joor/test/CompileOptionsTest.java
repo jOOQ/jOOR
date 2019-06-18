@@ -16,7 +16,7 @@ package org.joor.test;
 import java.io.Serializable;
 import java.util.Collections;
 
-/* [java-8] */
+
 
 import java.util.HashSet;
 import java.util.Set;
@@ -183,4 +183,3 @@ public class CompileOptionsTest {
 @interface A {}
 @interface B {}
 
-/* [/java-8] */

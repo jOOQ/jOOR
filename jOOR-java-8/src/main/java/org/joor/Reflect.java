@@ -52,7 +52,7 @@ public class Reflect {
     // Static API used as entrance points to the fluent API
     // ---------------------------------------------------------------------
 
-    /* [java-8] */
+
     /**
      * Compile a class at runtime and reflect on it.
      * <p>
@@ -101,7 +101,7 @@ public class Reflect {
     public static Reflect compile(String name, String content, CompileOptions options) throws ReflectException {
         return onClass(Compile.compile(name, content, options));
     }
-    /* [/java-8] */
+
 
     /**
      * Wrap a class name.
@@ -283,7 +283,7 @@ public class Reflect {
     // Members
     // ---------------------------------------------------------------------
 
-    /* [java-8] */
+
     static final Constructor<MethodHandles.Lookup> CACHED_LOOKUP_CONSTRUCTOR;
 
     static {
@@ -308,7 +308,7 @@ public class Reflect {
 
         CACHED_LOOKUP_CONSTRUCTOR = result;
     }
-    /* [/java-8] */
+
 
     /**
      * The type of the wrapped object.
@@ -750,7 +750,7 @@ public class Reflect {
                         }
                     }
 
-                    /* [java-8] */
+
                     if (method.isDefault()) {
 
 
@@ -772,7 +772,7 @@ public class Reflect {
                             .bindTo(proxy)
                             .invokeWithArguments(args);
                     }
-                    /* [/java-8] */
+
 
                     throw e;
                 }

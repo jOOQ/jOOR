@@ -13,7 +13,7 @@
  */
 package org.joor;
 
-/* [java-8] */
+
 
 import java.util.Arrays;
 
@@ -61,4 +61,4 @@ public final class CompileOptions {
         return new CompileOptions(processors, newOptions);
     }
 }
-/* [/java-8] */
+

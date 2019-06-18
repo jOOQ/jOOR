@@ -555,7 +555,7 @@ public class ReflectTest {
         assertFalse(a.equals(null));
     }
 
-    /* [java-8] */
+
     @Test
     public void shouldCallDefaultMethod(){
 
@@ -568,7 +568,7 @@ public class ReflectTest {
         expectedException.expect(IllegalArgumentException.class);
         Reflect.on(new Object()).as(InterfaceWithDefaultMethods.class).throwIllegalArgumentException();
     }
-    /* [/java-8] */
+
 
     @Test
     public void testNullStaticFieldType() {

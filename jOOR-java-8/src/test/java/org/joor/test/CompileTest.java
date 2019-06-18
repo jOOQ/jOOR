@@ -13,7 +13,7 @@
  */
 package org.joor.test;
 
-/* [java-8] */
+
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -185,4 +185,3 @@ interface I extends J {
     }
 }
 
-/* [/java-8] */
