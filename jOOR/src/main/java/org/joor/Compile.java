@@ -82,7 +82,7 @@ class Compile {
                                 classpath.append(separator);
 
                             if ("file".equals(url.getProtocol()))
-                                classpath.append(new File(url.getFile()));
+                                classpath.append(new File(url.toURI()));
                         }
                     }
 
