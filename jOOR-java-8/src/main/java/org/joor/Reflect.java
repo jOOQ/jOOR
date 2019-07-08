@@ -712,18 +712,29 @@ public class Reflect {
     }
 
     /**
-     * Create a proxy for the wrapped object allowing to typesafely invoke
-     * methods on it using a custom interface
+     * Create a proxy for the wrapped object allowing to typesafely invoke methods
+     * on it using a custom interface.
      *
      * @param proxyType The interface type that is implemented by the proxy
      * @return A proxy for the wrapped object
      */
+    public <P> P as(Class<P> proxyType) {
+        return as(proxyType, new Class[0]);
+    }
+
+    /**
+     * Create a proxy for the wrapped object allowing to typesafely invoke methods
+     * on it using a custom interface.
+     *
+     * @param proxyType The interface type that is implemented by the proxy
+     * @param additionalInterfaces
+     * @return A proxy for the wrapped object
+     */
     @SuppressWarnings("unchecked")
-    public <P> P as(final Class<P> proxyType) {
+    public <P> P as(final Class<P> proxyType, final Class<?>... additionalInterfaces) {
         final boolean isMap = (object instanceof Map);
         final InvocationHandler handler = new InvocationHandler() {
             @Override
-            @SuppressWarnings("null")
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 String name = method.getName();
 
@@ -779,7 +790,10 @@ public class Reflect {
             }
         };
 
-        return (P) Proxy.newProxyInstance(proxyType.getClassLoader(), new Class[] { proxyType }, handler);
+        Class<?>[] interfaces = new Class[1 + additionalInterfaces.length];
+        interfaces[0] = proxyType;
+        System.arraycopy(additionalInterfaces, 0, interfaces, 1, additionalInterfaces.length);
+        return (P) Proxy.newProxyInstance(proxyType.getClassLoader(), interfaces, handler);
     }
 
     /**

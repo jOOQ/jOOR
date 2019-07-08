@@ -30,8 +30,19 @@ import java.util.Map;
 
 import org.joor.Reflect;
 import org.joor.ReflectException;
-import org.joor.test.Test2.ConstructorType;
-import org.joor.test.Test3.MethodType;
+import org.joor.test.interfaces.PartialStringAPI1;
+import org.joor.test.interfaces.PartialStringAPI2;
+import org.joor.test.interfaces.Test1;
+import org.joor.test.interfaces.Test10;
+import org.joor.test.interfaces.Test11;
+import org.joor.test.interfaces.Test2;
+import org.joor.test.interfaces.Test2.ConstructorType;
+import org.joor.test.interfaces.Test3;
+import org.joor.test.interfaces.Test3.MethodType;
+import org.joor.test.interfaces.Test4;
+import org.joor.test.interfaces.Test6;
+import org.joor.test.interfaces.Test8;
+import org.joor.test.interfaces.MapContainer;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -181,7 +192,7 @@ public class ReflectTest {
 
     @Test
     public void testNullArguments() throws Exception {
-        Test9 test9 = new Test9();
+        MapContainer test9 = new MapContainer();
         on(test9).call("put", "key", "value");
         assertTrue(test9.map.containsKey("key"));
         assertEquals("value", test9.map.get("key"));
@@ -421,21 +432,33 @@ public class ReflectTest {
 
     @Test
     public void testProxy() {
-        assertEquals("abc", on((Object) "abc").as(Test5.class).substring(0));
-        assertEquals("bc", on((Object) "abc").as(Test5.class).substring(1));
-        assertEquals("c", on((Object) "abc").as(Test5.class).substring(2));
+        assertEquals("abc", on((Object) "abc").as(PartialStringAPI1.class).substring(0));
+        assertEquals("bc", on((Object) "abc").as(PartialStringAPI1.class).substring(1));
+        assertEquals("c", on((Object) "abc").as(PartialStringAPI1.class).substring(2));
 
-        assertEquals("a", on((Object) "abc").as(Test5.class).substring(0, 1));
-        assertEquals("b", on((Object) "abc").as(Test5.class).substring(1, 2));
-        assertEquals("c", on((Object) "abc").as(Test5.class).substring(2, 3));
+        assertEquals("a", on((Object) "abc").as(PartialStringAPI1.class).substring(0, 1));
+        assertEquals("b", on((Object) "abc").as(PartialStringAPI1.class).substring(1, 2));
+        assertEquals("c", on((Object) "abc").as(PartialStringAPI1.class).substring(2, 3));
 
-        assertEquals("abc", on((Object) "abc").as(Test5.class).substring(0));
-        assertEquals("bc", on((Object) "abc").as(Test5.class).substring(1));
-        assertEquals("c", on((Object) "abc").as(Test5.class).substring(2));
+        assertEquals("abc", on((Object) "abc").as(PartialStringAPI1.class).substring(0));
+        assertEquals("bc", on((Object) "abc").as(PartialStringAPI1.class).substring(1));
+        assertEquals("c", on((Object) "abc").as(PartialStringAPI1.class).substring(2));
 
-        assertEquals("a", on((Object) "abc").as(Test5.class).substring(0, 1));
-        assertEquals("b", on((Object) "abc").as(Test5.class).substring(1, 2));
-        assertEquals("c", on((Object) "abc").as(Test5.class).substring(2, 3));
+        assertEquals("a", on((Object) "abc").as(PartialStringAPI1.class).substring(0, 1));
+        assertEquals("b", on((Object) "abc").as(PartialStringAPI1.class).substring(1, 2));
+        assertEquals("c", on((Object) "abc").as(PartialStringAPI1.class).substring(2, 3));
+    }
+
+    @Test
+    public void testMultipleInterfaceProxy() {
+        assertEquals("abc", on((Object) "abc").as(PartialStringAPI1.class, PartialStringAPI2.class).substring(0));
+        assertEquals("bc", on((Object) "abc").as(PartialStringAPI1.class, PartialStringAPI2.class).substring(1));
+        assertEquals("c", on((Object) "abc").as(PartialStringAPI1.class, PartialStringAPI2.class).substring(2));
+
+        assertTrue(((PartialStringAPI2) on((Object) "abc").as(PartialStringAPI1.class, PartialStringAPI2.class)).contains("a"));
+        assertTrue(((PartialStringAPI2) on((Object) "abc").as(PartialStringAPI1.class, PartialStringAPI2.class)).contains("b"));
+        assertTrue(((PartialStringAPI2) on((Object) "abc").as(PartialStringAPI1.class, PartialStringAPI2.class)).contains("c"));
+        assertFalse(((PartialStringAPI2) on((Object) "abc").as(PartialStringAPI1.class, PartialStringAPI2.class)).contains("d"));
     }
 
     @Test
