@@ -723,13 +723,15 @@ public class Reflect {
     }
 
     /**
-     * Create a proxy for the wrapped object allowing to typesafely invoke methods
-     * on it using a custom interface.
-     *
-     * @param proxyType The interface type that is implemented by the proxy
-     * @param additionalInterfaces
-     * @return A proxy for the wrapped object
-     */
+	 * Create a proxy for the wrapped object allowing to typesafely invoke methods
+	 * on it using a custom interface.
+	 *
+	 * @param proxyType            The interface type that is implemented by the
+	 *                             proxy
+	 * @param additionalInterfaces Additional interfaces that are implemented by the
+	 *                             proxy
+	 * @return A proxy for the wrapped object
+	 */
     @SuppressWarnings("unchecked")
     public <P> P as(final Class<P> proxyType, final Class<?>... additionalInterfaces) {
         final boolean isMap = (object instanceof Map);
