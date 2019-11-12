@@ -50,11 +50,7 @@ import javax.tools.ToolProvider;
  */
 class Compile {
 
-	static Class<?> compile(String className, String content, CompileOptions compileOptions) {
-		return compile(className, content, compileOptions, false);
-	}
-
-	static Class<?> compile(String className, String content, CompileOptions compileOptions, boolean skipLoaded) {
+    static Class<?> compile(String className, String content, CompileOptions compileOptions) {
         Lookup lookup = MethodHandles.lookup();
         ClassLoader cl = lookup.lookupClass().getClassLoader();
 
@@ -65,7 +61,7 @@ class Compile {
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
             try {
-                ClassFileManager fileManager = new ClassFileManager(compiler.getStandardFileManager(null, null, null), skipLoaded);
+                ClassFileManager fileManager = new ClassFileManager(compiler.getStandardFileManager(null, null, null), compileOptions.skipLoadedClasses());
 
                 List<CharSequenceJavaFileObject> files = new ArrayList<>();
                 files.add(new CharSequenceJavaFileObject(className, content));
@@ -110,6 +106,47 @@ class Compile {
                     result = fileManager.loadAndReturnMainClass(className,
                         (name, bytes) -> Reflect.on(cl).call("defineClass", name, bytes, 0, bytes.length).get());
                 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 return result;
             }
             catch (ReflectException e) {
@@ -120,6 +157,22 @@ class Compile {
             }
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     static final class JavaFileObject extends SimpleJavaFileObject {
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -140,17 +193,18 @@ class Compile {
 
     static final class ClassFileManager extends ForwardingJavaFileManager<StandardJavaFileManager> {
         private final Map<String, JavaFileObject> fileObjectMap;
-        private final boolean skipLoaded;
         private Map<String, byte[]> classes;
+        private final boolean skipLoadedClasses;
 
         ClassFileManager(StandardJavaFileManager standardManager) {
             this(standardManager, false);
         }
 
-        ClassFileManager(StandardJavaFileManager standardManager, boolean skipLoaded) {
+        ClassFileManager(StandardJavaFileManager standardManager, boolean skipLoadedClasses) {
             super(standardManager);
-            this.skipLoaded = skipLoaded;
+
             fileObjectMap = new HashMap<>();
+            this.skipLoadedClasses = skipLoadedClasses;
         }
 
         @Override
@@ -185,7 +239,7 @@ class Compile {
 
             for (Entry<String, byte[]> entry : classes().entrySet()) {
                 Class<?> loaded = null;
-                if (skipLoaded) {
+                if (skipLoadedClasses) {
                     Lookup lookup = MethodHandles.lookup();
                     ClassLoader cl = lookup.lookupClass().getClassLoader();
                     try {
@@ -222,4 +276,3 @@ class Compile {
         }
     }
 }
-

@@ -29,6 +29,7 @@ public final class CompileOptions {
 
     final List<? extends Processor> processors;
     final List<String> options;
+    boolean skipLoadedClasses;
 
     public CompileOptions() {
         this(
@@ -59,6 +60,14 @@ public final class CompileOptions {
 
     public final CompileOptions options(List<String> newOptions) {
         return new CompileOptions(processors, newOptions);
+    }
+
+    public final boolean skipLoadedClasses() {
+        return skipLoadedClasses;
+    }
+
+    public final void skipLoadedClasses(boolean skipLoadedClasses) {
+        this.skipLoadedClasses = skipLoadedClasses;
     }
 }
 

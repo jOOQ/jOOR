@@ -103,10 +103,6 @@ public class Reflect {
         return onClass(Compile.compile(name, content, options));
     }
 
-    public static Reflect compileSkipLoaded(String name, String content, CompileOptions options) throws ReflectException {
-        return onClass(Compile.compile(name, content, options, true));
-    }
-
     /**
      * Wrap a class name.
      * <p>
