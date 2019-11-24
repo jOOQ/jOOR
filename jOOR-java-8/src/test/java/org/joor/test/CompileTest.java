@@ -18,12 +18,14 @@ package org.joor.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.joor.CompileOptions;
 import org.joor.Reflect;
 import org.joor.ReflectException;
 import org.joor.test.CompileTest.J;
@@ -175,6 +177,14 @@ public class CompileTest {
 
         int foo = Reflect.onClass(c).create().call("other").call("foo").get();
         assertEquals(42, foo);
+    }
+
+    @Test
+    public void testSkipLoadedClasses() throws Exception {
+        CompileOptions options = new CompileOptions().options("-sourcepath", "src/test/java/").options("-classpath", "src/test/java");
+        options.skipLoadedClasses(true);
+        Reflect.compile("TestHierarchicalMethodsBase", new String(java.nio.file.Files.readAllBytes(new File("src/test/java/org/joor/test/TestHierarchicalMethodsBase.java").toPath())), options);
+        Reflect.compile("TestHierarchicalMethodsSubclass", new String(java.nio.file.Files.readAllBytes(new File("src/test/java/org/joor/test/TestHierarchicalMethodsSubclass.java").toPath())), options);
     }
 }
 
