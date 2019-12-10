@@ -14,6 +14,7 @@
 package org.joor;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -776,6 +777,10 @@ public class Reflect {
 
 
                     if (method.isDefault()) {
+                    	Lookup proxyLookup = null;
+
+                        // Java 9 version
+                        if (CACHED_LOOKUP_CONSTRUCTOR == null) {
 
 
 
@@ -783,16 +788,19 @@ public class Reflect {
 
 
 
-
-
-
-
-
+                        	// Java 9 version for Java 8 distribution (jOOQ Open Source Edition)
+	                        if (proxyLookup == null)
+	                        	proxyLookup = onClass(MethodHandles.class)
+	                        			.call("privateLookupIn", proxyType, MethodHandles.lookup())
+	                        			.call("in", proxyType)
+	                        			.<Lookup>get();
+                        }
 
                         // Java 8 version
-                        return CACHED_LOOKUP_CONSTRUCTOR
-                            .newInstance(proxyType)
-                            .unreflectSpecial(method, proxyType)
+                        else
+                        	proxyLookup = CACHED_LOOKUP_CONSTRUCTOR.newInstance(proxyType);
+
+                        return proxyLookup.unreflectSpecial(method, proxyType)
                             .bindTo(proxy)
                             .invokeWithArguments(args);
                     }

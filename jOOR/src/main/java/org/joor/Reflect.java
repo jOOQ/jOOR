@@ -14,6 +14,7 @@
 package org.joor;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -776,23 +777,30 @@ public class Reflect {
 
                     /* [java-8] */
                     if (method.isDefault()) {
+                    	Lookup proxyLookup = null;
 
-                        /* [java-9] */
                         // Java 9 version
                         if (CACHED_LOOKUP_CONSTRUCTOR == null) {
-                            return MethodHandles
-                                .privateLookupIn(proxyType, MethodHandles.lookup())
-                                .in(proxyType)
-                                .unreflectSpecial(method, proxyType)
-                                .bindTo(proxy)
-                                .invokeWithArguments(args);
+
+                        	/* [java-9] */
+	                        proxyLookup = MethodHandles
+	                                .privateLookupIn(proxyType, MethodHandles.lookup())
+	                                .in(proxyType);
+                            /* [/java-9] */
+
+                        	// Java 9 version for Java 8 distribution (jOOQ Open Source Edition)
+	                        if (proxyLookup == null)
+	                        	proxyLookup = onClass(MethodHandles.class)
+	                        			.call("privateLookupIn", proxyType, MethodHandles.lookup())
+	                        			.call("in", proxyType)
+	                        			.<Lookup>get();
                         }
-                        /* [/java-9] */
 
                         // Java 8 version
-                        return CACHED_LOOKUP_CONSTRUCTOR
-                            .newInstance(proxyType)
-                            .unreflectSpecial(method, proxyType)
+                        else
+                        	proxyLookup = CACHED_LOOKUP_CONSTRUCTOR.newInstance(proxyType);
+
+                        return proxyLookup.unreflectSpecial(method, proxyType)
                             .bindTo(proxy)
                             .invokeWithArguments(args);
                     }
