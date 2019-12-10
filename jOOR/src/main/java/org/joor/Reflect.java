@@ -735,15 +735,14 @@ public class Reflect {
     }
 
     /**
-	 * Create a proxy for the wrapped object allowing to typesafely invoke methods
-	 * on it using a custom interface.
-	 *
-	 * @param proxyType            The interface type that is implemented by the
-	 *                             proxy
-	 * @param additionalInterfaces Additional interfaces that are implemented by the
-	 *                             proxy
-	 * @return A proxy for the wrapped object
-	 */
+     * Create a proxy for the wrapped object allowing to typesafely invoke
+     * methods on it using a custom interface.
+     *
+     * @param proxyType The interface type that is implemented by the proxy
+     * @param additionalInterfaces Additional interfaces that are implemented by
+     *            the proxy
+     * @return A proxy for the wrapped object
+     */
     @SuppressWarnings("unchecked")
     public <P> P as(final Class<P> proxyType, final Class<?>... additionalInterfaces) {
         final boolean isMap = (object instanceof Map);
@@ -777,28 +776,28 @@ public class Reflect {
 
                     /* [java-8] */
                     if (method.isDefault()) {
-                    	Lookup proxyLookup = null;
+                        Lookup proxyLookup = null;
 
                         // Java 9 version
                         if (CACHED_LOOKUP_CONSTRUCTOR == null) {
 
-                        	/* [java-9] */
-	                        proxyLookup = MethodHandles
-	                                .privateLookupIn(proxyType, MethodHandles.lookup())
-	                                .in(proxyType);
+                            /* [java-9] */
+                            proxyLookup = MethodHandles
+                                .privateLookupIn(proxyType, MethodHandles.lookup())
+                                .in(proxyType);
                             /* [/java-9] */
 
-                        	// Java 9 version for Java 8 distribution (jOOQ Open Source Edition)
-	                        if (proxyLookup == null)
-	                        	proxyLookup = onClass(MethodHandles.class)
-	                        			.call("privateLookupIn", proxyType, MethodHandles.lookup())
-	                        			.call("in", proxyType)
-	                        			.<Lookup>get();
+                            // Java 9 version for Java 8 distribution (jOOQ Open Source Edition)
+                            if (proxyLookup == null)
+                                proxyLookup = onClass(MethodHandles.class)
+                                    .call("privateLookupIn", proxyType, MethodHandles.lookup())
+                                    .call("in", proxyType)
+                                    .<Lookup> get();
                         }
 
                         // Java 8 version
                         else
-                        	proxyLookup = CACHED_LOOKUP_CONSTRUCTOR.newInstance(proxyType);
+                            proxyLookup = CACHED_LOOKUP_CONSTRUCTOR.newInstance(proxyType);
 
                         return proxyLookup.unreflectSpecial(method, proxyType)
                             .bindTo(proxy)
