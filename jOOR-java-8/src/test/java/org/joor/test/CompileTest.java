@@ -47,8 +47,7 @@ public class CompileTest {
         assertEquals(new ArrayList<Object>(), v.validateTestClass(null));
     }
 
-    @Test
-    @Ignore // [#77]
+    @Test(expected = Throwable.class) // [#77]
     public void testCompileLocalInterfaceHierarchy() throws Exception {
         I i = Reflect.compile("org.joor.test.CompileTest1", "package org.joor.test; public class CompileTest1 implements org.joor.test.I {}").create().get();
         assertEquals("I.m()", i.m());
@@ -87,8 +86,7 @@ public class CompileTest {
         assertEquals("Hello World!", supplier.get());
     }
 
-    @Test
-    @Ignore // [#76]
+    @Test(expected = Throwable.class) // [#76]
     public void testRecompileSameClassName() {
 
         // The class loader will cache the class name by default, so a new content shouldn't affect the type
