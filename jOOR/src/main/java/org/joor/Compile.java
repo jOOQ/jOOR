@@ -163,13 +163,19 @@ class Compile {
         private final Map<String, byte[]> classes;
 
         ByteArrayClassLoader(Map<String, byte[]> classes) {
+            super(ByteArrayClassLoader.class.getClassLoader());
+
             this.classes = classes;
         }
 
         @Override
-        protected Class<?> findClass(String name) {
+        protected Class<?> findClass(String name) throws ClassNotFoundException {
             byte[] bytes = classes.get(name);
-            return defineClass(name, bytes, 0, bytes.length);
+
+            if (bytes == null)
+                return super.findClass(name);
+            else
+                return defineClass(name, bytes, 0, bytes.length);
         }
     }
     /* [/java-9] */
