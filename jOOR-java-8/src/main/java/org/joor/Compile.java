@@ -26,6 +26,7 @@ import java.lang.invoke.MethodHandles.Lookup;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map.Entry;
@@ -194,6 +195,11 @@ class Compile {
         @Override
         public OutputStream openOutputStream() {
             return os;
+        }
+
+        @Override
+        public CharSequence getCharContent(final boolean ignoreEncodingErrors) {
+            return new String(this.os.toByteArray(), Charset.forName("UTF-8"));
         }
     }
 
