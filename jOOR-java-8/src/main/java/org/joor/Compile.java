@@ -27,12 +27,13 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
-import java.util.*;
-import java.util.AbstractMap.SimpleImmutableEntry;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
@@ -196,10 +197,10 @@ class Compile {
         public OutputStream openOutputStream() {
             return os;
         }
-
+        
         @Override
-        public CharSequence getCharContent(final boolean ignoreEncodingErrors) {
-            return new String(this.os.toByteArray(), Charset.forName("UTF-8"));
+        public CharSequence getCharContent(boolean ignoreEncodingErrors) {
+            return new String(os.toByteArray(), StandardCharsets.UTF_8);
         }
     }
 
