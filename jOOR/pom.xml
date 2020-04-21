@@ -87,7 +87,7 @@
 
     <profiles>
         <profile>
-            <id>release</id>
+            <id>release-oss</id>
             <build>
                 <plugins>
                     <plugin>
