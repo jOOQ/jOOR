@@ -106,7 +106,7 @@ The same example with normal reflection in Java:
 ````java
 try {
   Method m1 = department.getClass().getMethod("getEmployees");
-  Employee employees = (Employee[]) m1.invoke(department);
+  Employee[] employees = (Employee[]) m1.invoke(department);
 
   for (Employee employee : employees) {
     Method m2 = employee.getClass().getMethod("getAddress");
