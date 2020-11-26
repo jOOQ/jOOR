@@ -47,11 +47,11 @@ None!
 // All examples assume the following static import:
 import static org.joor.Reflect.*;
 
-String world = on("java.lang.String")  // Like Class.forName()
-                .create("Hello World") // Call most specific matching constructor
-                .call("substring", 6)  // Call most specific matching substring() method
-                .call("toString")      // Call toString()
-                .get();                // Get the wrapped object, in this case a String
+String world = onClass("java.lang.String") // Like Class.forName()
+                .create("Hello World")     // Call most specific matching constructor
+                .call("substring", 6)      // Call most specific matching substring() method
+                .call("toString")          // Call toString()
+                .get();                    // Get the wrapped object, in this case a String
 ````
 
 
@@ -64,7 +64,7 @@ public interface StringProxy {
   String substring(int beginIndex);
 }
 
-String substring = on("java.lang.String")
+String substring = onClass("java.lang.String")
                     .create("Hello World")
                     .as(StringProxy.class) // Create a proxy for the wrapped object
                     .substring(6);         // Call a proxy method
