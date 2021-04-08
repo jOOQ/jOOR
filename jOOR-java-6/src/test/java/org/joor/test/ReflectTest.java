@@ -644,4 +644,31 @@ public class ReflectTest {
         assertNull(Reflect.initValue(Character.class));
         assertNull(Reflect.initValue(Boolean.class));
     }
+
+    @Test
+    public void testWrapper() {
+
+        // Use otherwise meaningless local variables to compile-test generics.
+        Class<String> o = Reflect.wrapper(String.class);
+        Class<Boolean> z = Reflect.wrapper(boolean.class);
+        Class<Byte> b = Reflect.wrapper(byte.class);
+        Class<Short> s = Reflect.wrapper(short.class);
+        Class<Integer> i = Reflect.wrapper(int.class);
+        Class<Long> l = Reflect.wrapper(long.class);
+        Class<Float> f = Reflect.wrapper(float.class);
+        Class<Double> d = Reflect.wrapper(double.class);
+        Class<Character> c = Reflect.wrapper(char.class);
+        Class<Void> v = Reflect.wrapper(void.class);
+
+        assertEquals(o, String.class);
+        assertEquals(z, Boolean.class);
+        assertEquals(b, Byte.class);
+        assertEquals(s, Short.class);
+        assertEquals(i, Integer.class);
+        assertEquals(l, Long.class);
+        assertEquals(f, Float.class);
+        assertEquals(d, Double.class);
+        assertEquals(c, Character.class);
+        assertEquals(v, Void.class);
+    }
 }
