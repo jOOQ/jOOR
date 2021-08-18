@@ -11,3 +11,7 @@ script:
   - sh -c 'cd jOOR && mvn test'
   - sh -c 'cd jOOR-java-8 && mvn test'
   - sh -c 'cd jOOR-java-6 && mvn test'
+
+cache:
+  directories:
+  - $HOME/.m2
