@@ -47,7 +47,7 @@ public class CompileTest {
         assertEquals(new ArrayList<Object>(), v.validateTestClass(null));
     }
 
-    @Test /* [java-9] */ (expected = Throwable.class) // [#77] /* [/java-9] */ 
+    @Test /* [java-9] */ (expected = Throwable.class) // [#77] /* [/java-9] */
     public void testCompileLocalInterfaceHierarchy() throws Exception {
         I i = Reflect.compile("org.joor.test.CompileTest1", "package org.joor.test; public class CompileTest1 implements org.joor.test.I {}").create().get();
         assertEquals("I.m()", i.m());
@@ -86,7 +86,7 @@ public class CompileTest {
         assertEquals("Hello World!", supplier.get());
     }
 
-    @Test /* [java-9] */ (expected = Throwable.class) // [#76] /* [/java-9] */ 
+    @Test/* [java-9] */ (expected = Throwable.class) // [#76] /* [/java-9] */
     public void testRecompileSameClassName() {
 
         // The class loader will cache the class name by default, so a new content shouldn't affect the type
@@ -174,6 +174,57 @@ public class CompileTest {
         int foo = Reflect.onClass(c).create().call("other").call("foo").get();
         assertEquals(42, foo);
     }
+
+    @Test
+    public void testClassLoadingOrder1() {
+        Class<?> a;
+
+        a = Reflect.compile("p.A", "package p; public class A extends B {} class B {}").type();
+        assertEquals("p.A", a.getName());
+        assertEquals("p.B", a.getSuperclass().getName());
+
+        a = Reflect.compile("p.A", "package p; class B {} public class A extends B {}").type();
+        assertEquals("p.A", a.getName());
+        assertEquals("p.B", a.getSuperclass().getName());
+    }
+
+    @Test
+    public void testClassLoadingOrder2() {
+        Class<?> d;
+
+        d = Reflect.compile("p.D", "package p; public class D extends B {} class B {}").type();
+        assertEquals("p.D", d.getName());
+        assertEquals("p.B", d.getSuperclass().getName());
+
+        d = Reflect.compile("p.D", "package p; class B {} public class D extends B {}").type();
+        assertEquals("p.D", d.getName());
+        assertEquals("p.B", d.getSuperclass().getName());
+    }
+
+    /* [java-9] */
+
+    // This test seems to fail in Java 8. p.B doesn't correctly extend p.C
+    @Test
+    public void testClassLoadingOrder3() {
+        Class<?> a = Reflect.compile("p.A", "package p; "
+                + "public class A extends B {} "
+                + "class B extends C {} "
+                + "class C implements D {} "
+                + "interface D extends E {} "
+                + "interface E {}").type();
+
+        Class<?> b = a.getSuperclass();
+        Class<?> c = b.getSuperclass();
+        assertEquals("p.A", a.getName());
+        assertEquals("p.B", b.getName());
+        assertEquals("p.C", c.getName());
+        assertEquals(1, c.getInterfaces().length);
+        assertEquals("p.D", c.getInterfaces()[0].getName());
+        assertEquals(1, c.getInterfaces()[0].getInterfaces().length);
+        assertEquals("p.E", c.getInterfaces()[0].getInterfaces()[0].getName());
+    }
+
+    /* [/java-9] */
 }
 
 interface I extends J {

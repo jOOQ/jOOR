@@ -47,7 +47,7 @@ public class CompileTest {
         assertEquals(new ArrayList<Object>(), v.validateTestClass(null));
     }
 
-    @Test  
+    @Test 
     public void testCompileLocalInterfaceHierarchy() throws Exception {
         I i = Reflect.compile("org.joor.test.CompileTest1", "package org.joor.test; public class CompileTest1 implements org.joor.test.I {}").create().get();
         assertEquals("I.m()", i.m());
@@ -86,7 +86,7 @@ public class CompileTest {
         assertEquals("Hello World!", supplier.get());
     }
 
-    @Test  
+    @Test
     public void testRecompileSameClassName() {
 
         // The class loader will cache the class name by default, so a new content shouldn't affect the type
@@ -174,6 +174,57 @@ public class CompileTest {
         int foo = Reflect.onClass(c).create().call("other").call("foo").get();
         assertEquals(42, foo);
     }
+
+    @Test
+    public void testClassLoadingOrder1() {
+        Class<?> a;
+
+        a = Reflect.compile("p.A", "package p; public class A extends B {} class B {}").type();
+        assertEquals("p.A", a.getName());
+        assertEquals("p.B", a.getSuperclass().getName());
+
+        a = Reflect.compile("p.A", "package p; class B {} public class A extends B {}").type();
+        assertEquals("p.A", a.getName());
+        assertEquals("p.B", a.getSuperclass().getName());
+    }
+
+    @Test
+    public void testClassLoadingOrder2() {
+        Class<?> d;
+
+        d = Reflect.compile("p.D", "package p; public class D extends B {} class B {}").type();
+        assertEquals("p.D", d.getName());
+        assertEquals("p.B", d.getSuperclass().getName());
+
+        d = Reflect.compile("p.D", "package p; class B {} public class D extends B {}").type();
+        assertEquals("p.D", d.getName());
+        assertEquals("p.B", d.getSuperclass().getName());
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 interface I extends J {

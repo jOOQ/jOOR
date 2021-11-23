@@ -27,8 +27,10 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -246,10 +248,35 @@ class Compile {
         Class<?> loadAndReturnMainClass(String mainClassName, ThrowingBiFunction<String, byte[], Class<?>> definer) throws Exception {
             Class<?> result = null;
 
-            for (Entry<String, byte[]> entry : classes().entrySet()) {
-                Class<?> c = definer.apply(entry.getKey(), entry.getValue());
-                if (mainClassName.equals(entry.getKey()))
-                    result = c;
+            // [#117] We don't know the subclass hierarchy of the top level
+            //        classes in the compilation unit, and we can't find out
+            //        without either:
+            //
+            //        - class loading them (which fails due to NoClassDefFoundError)
+            //        - using a library like ASM (which is a big and painful dependency)
+            //
+            //        Simple workaround: try until it works, in O(n^2), where n
+            //        can be reasonably expected to be small.
+            Deque<Entry<String, byte[]>> queue = new ArrayDeque<>(classes().entrySet());
+            int n1 = queue.size();
+
+            // Try at most n times
+            for (int i1 = 0; i1 < n1 && !queue.isEmpty(); i1++) {
+            	int n2 = queue.size();
+
+            	for (int i2 = 0; i2 < n2; i2 ++) {
+	            	Entry<String, byte[]> entry = queue.pop();
+
+	            	try {
+		                Class<?> c = definer.apply(entry.getKey(), entry.getValue());
+
+		                if (mainClassName.equals(entry.getKey()))
+		                    result = c;
+	            	}
+	            	catch (ReflectException e) {
+	            		queue.offer(entry);
+	            	}
+            	}
             }
 
             return result;
