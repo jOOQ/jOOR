@@ -17,45 +17,72 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Unit for holding multiple source files to be compiled in one go.
+ */
 public class CompilationUnit {
 
     private final Map<String, String> files = new LinkedHashMap<>();
 
+    /**
+     * The result of the compilation that holds mapping for each className -> class.
+     */
     public static class Result {
         private final Map<String, Class<?>> classes = new LinkedHashMap<>();
 
-        public void addResult(String className, Class<?> clazz) {
+        void addResult(String className, Class<?> clazz) {
             classes.put(className, clazz);
         }
 
+        /**
+         * Gets the compiled class by its class name
+         *
+         * @param className the class name
+         * @return the compiled class
+         */
         public Class<?> getClass(String className) {
             return classes.get(className);
         }
 
+        /**
+         * Number of classes in the result
+         */
         public int size() {
             return classes.size();
         }
 
+        /**
+         * Set of the classes by their names
+         */
         public Set<String> getClassNames() {
             return classes.keySet();
         }
 
     }
 
+    static CompilationUnit.Result result() {
+        return new Result();
+    }
+
+    /**
+     * Creates a new compilation unit for holding input files.
+     */
     public static CompilationUnit input() {
         return new CompilationUnit();
     }
 
-    public static CompilationUnit.Result result() {
-        return new Result();
-    }
-
+    /**
+     * Adds input to the compilation unit.
+     *
+     * @param className  the class name
+     * @param content    the source code for the class
+     */
     public CompilationUnit addClass(String className, String content) {
         files.put(className, content);
         return this;
     }
 
-    Map<String, String> getFiles() {
+    Map<String, String> getInput() {
         return files;
     }
 }

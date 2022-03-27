@@ -65,7 +65,7 @@ public class MultiCompile {
 
         Lookup lookup = MethodHandles.lookup();
         ClassLoader cl = lookup.lookupClass().getClassLoader();
-        unit.getFiles().forEach((cn, code) -> {
+        unit.getInput().forEach((cn, code) -> {
             try {
                 Class<?> clazz = cl.loadClass(cn);
                 result.addResult(cn, clazz);
@@ -139,7 +139,7 @@ public class MultiCompile {
                 for (CharSequenceJavaFileObject f : files) {
                     String className = f.getClassName();
 
-                    Class<?> caller = getClassFromIndex(index++);
+                    Class<?> caller = findCompiledClassViaIndex(index++);
 
                     // If the compiled class is in the same package as the caller class, then
                     // we can use the private-access Lookup of the caller class
@@ -180,7 +180,7 @@ public class MultiCompile {
         }
     }
 
-    private static Class<?> getClassFromIndex(int index) {
+    private static Class<?> findCompiledClassViaIndex(int index) {
         StackWalker.StackFrame sf = StackWalker
                 .getInstance(RETAIN_CLASS_REFERENCE)
                 .walk(s -> s
