@@ -35,13 +35,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Stream;
 
 import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
 
@@ -50,8 +48,15 @@ import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
  *
  * @author Lukas Eder
  */
-public class CompileUnit {
+public class MultiCompile {
 
+    /**
+     * Compiles multiple files as one unit
+     *
+     * @param unit           the files to compile in the same unit
+     * @param compileOptions compile options
+     * @return the compilation result
+     */
     public static CompilationUnit.Result compileUnit(CompilationUnit unit, CompileOptions compileOptions) {
         CompilationUnit.Result result = CompilationUnit.result();
 
@@ -130,24 +135,15 @@ public class CompileUnit {
                 // This method is called by client code from two levels up the current stack frame
                 // We need a private-access lookup from the class in that stack frame in order to get
                 // private-access to any local interfaces at that location.
-//                Class<?> caller = StackWalker
-//                        .getInstance(RETAIN_CLASS_REFERENCE)
-//                        .walk(s -> s
-//                                .skip(2)
-//                                .findFirst()
-//                                .get()
-//                                .getDeclaringClass());
-
                 int index = 2;
                 for (CharSequenceJavaFileObject f : files) {
                     String className = f.getClassName();
 
-                    Class<?> caller = getClassFromIndex(index);
-                    index++;
+                    Class<?> caller = getClassFromIndex(index++);
 
                     // If the compiled class is in the same package as the caller class, then
                     // we can use the private-access Lookup of the caller class
-                    if (className.startsWith(caller.getPackageName() + ".") &&
+                    if (caller != null && className.startsWith(caller.getPackageName() + ".") &&
 
                             // [#74] This heuristic is necessary to prevent classes in subpackages of the caller to be loaded
                             //       this way, as subpackages cannot access private content in super packages.
@@ -185,13 +181,13 @@ public class CompileUnit {
     }
 
     private static Class<?> getClassFromIndex(int index) {
-        return StackWalker
+        StackWalker.StackFrame sf = StackWalker
                 .getInstance(RETAIN_CLASS_REFERENCE)
                 .walk(s -> s
                         .skip(index)
                         .findFirst()
-                        .get()
-                        .getDeclaringClass());
+                        .orElse(null));
+        return sf != null ? sf.getDeclaringClass() : null;
     }
 
     /* [java-9] */

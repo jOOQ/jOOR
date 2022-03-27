@@ -25,7 +25,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -52,7 +51,7 @@ import java.util.Optional;
 public class Reflect {
 
     public static CompilationUnit.Result compileUnit(CompilationUnit unit) throws ReflectException {
-        return CompileUnit.compileUnit(unit, new CompileOptions());
+        return MultiCompile.compileUnit(unit, new CompileOptions());
     }
 
     // ---------------------------------------------------------------------

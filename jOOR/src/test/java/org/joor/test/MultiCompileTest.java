@@ -19,7 +19,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class CompileUnitTest {
+public class MultiCompileTest {
 
     @Test
     public void testSingleUnit() throws Exception {
@@ -70,6 +70,40 @@ public class CompileUnitTest {
         Object out3 = ref3.create().call("get").get();
         assertEquals("Bye World!", out2);
         assertEquals("Hi World!", out3);
+    }
+
+    @Test
+    public void testClassLoadingOrder() throws Exception {
+        CompilationUnit unit = CompilationUnit.input()
+                .addClass("pm.A", "package pm; public class A extends B {}")
+                .addClass("pm.B", "package pm; public class B {}"
+                );
+
+        CompilationUnit.Result result = Reflect.compileUnit(unit);
+        assertEquals(2, result.size());
+
+        Class<?> a = Reflect.onClass(result.getClass("pm.A")).type();
+        Class<?> b = Reflect.onClass(result.getClass("pm.B")).type();
+        assertEquals("pm.A", a.getName());
+        assertEquals("pm.B", a.getSuperclass().getName());
+        assertEquals("pm.B", b.getName());
+    }
+
+    @Test
+    public void testClassLoadingOrderReverse() throws Exception {
+        CompilationUnit unit = CompilationUnit.input()
+                .addClass("pm.C", "package pm; public class C {}")
+                .addClass("pm.D", "package pm; public class D extends C {}"
+                );
+
+        CompilationUnit.Result result = Reflect.compileUnit(unit);
+        assertEquals(2, result.size());
+
+        Class<?> c = Reflect.onClass(result.getClass("pm.C")).type();
+        Class<?> d = Reflect.onClass(result.getClass("pm.D")).type();
+        assertEquals("pm.C", c.getName());
+        assertEquals("pm.D", d.getName());
+        assertEquals("pm.C", d.getSuperclass().getName());
     }
 
 }
