@@ -15,10 +15,11 @@ package org.joor;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class CompilationUnit {
 
-    private Map<String, String> files = new LinkedHashMap<>();
+    private final Map<String, String> files = new LinkedHashMap<>();
 
     public static class Result {
         private final Map<String, Class<?>> classes = new LinkedHashMap<>();
@@ -35,9 +36,13 @@ public class CompilationUnit {
             return classes.size();
         }
 
+        public Set<String> getClassNames() {
+            return classes.keySet();
+        }
+
     }
 
-    public static CompilationUnit create() {
+    public static CompilationUnit input() {
         return new CompilationUnit();
     }
 
@@ -45,12 +50,12 @@ public class CompilationUnit {
         return new Result();
     }
 
-    public CompilationUnit unit(String className, String content) {
+    public CompilationUnit addClass(String className, String content) {
         files.put(className, content);
         return this;
     }
 
-    public Map<String, String> getFiles() {
+    Map<String, String> getFiles() {
         return files;
     }
 }

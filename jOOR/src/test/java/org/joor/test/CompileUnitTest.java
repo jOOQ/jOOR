@@ -23,8 +23,8 @@ public class CompileUnitTest {
 
     @Test
     public void testSingleUnit() throws Exception {
-        CompilationUnit unit = CompilationUnit.create()
-                .unit("org.joor.test.CompileMultiTest1",
+        CompilationUnit unit = CompilationUnit.input()
+                .addClass("org.joor.test.CompileMultiTest1",
                         "package org.joor.test;\n" +
                                 "class CompileMultiTest1 implements java.util.function.Supplier<String> {\n" +
                                 "  public String get() {\n" +
@@ -43,8 +43,8 @@ public class CompileUnitTest {
 
     @Test
     public void testDualUnit() throws Exception {
-        CompilationUnit unit = CompilationUnit.create()
-                .unit("org.joor.test.CompileMultiTest2",
+        CompilationUnit unit = CompilationUnit.input()
+                .addClass("org.joor.test.CompileMultiTest2",
                         "package org.joor.test;\n" +
                                 "class CompileMultiTest2 implements java.util.function.Supplier<String> {\n" +
                                 "  public String get() {\n" +
@@ -52,7 +52,7 @@ public class CompileUnitTest {
                                 "  }\n" +
                                 "}\n"
                 )
-                .unit("org.joor.test.CompileMultiTest3",
+                .addClass("org.joor.test.CompileMultiTest3",
                         "package org.joor.test;\n" +
                                 "class CompileMultiTest3 implements java.util.function.Supplier<String> {\n" +
                                 "  public String get() {\n" +
