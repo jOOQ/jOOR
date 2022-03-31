@@ -21,8 +21,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.processing.Processor;
-import javax.tools.DiagnosticListener;
-import javax.tools.JavaFileObject;
 
 /**
  * @author Lukas Eder
@@ -31,7 +29,6 @@ public final class CompileOptions {
 
     final List<? extends Processor> processors;
     final List<String> options;
-    DiagnosticListener<JavaFileObject> diagnosticListener;
 
     public CompileOptions() {
         this(
@@ -64,7 +61,7 @@ public final class CompileOptions {
         return new CompileOptions(processors, newOptions);
     }
 
-    public boolean hasOption(String opt) {
+    public boolean hashOption(String opt) {
         for (String option : options) {
             if (option.equalsIgnoreCase(opt)) {
                 return true;
@@ -72,11 +69,5 @@ public final class CompileOptions {
         }
         return false;
     }
-
-    public CompileOptions withDiagnosticListener(DiagnosticListener<JavaFileObject> listener) {
-        this.diagnosticListener = listener;
-        return this;
-    }
-
 }
 

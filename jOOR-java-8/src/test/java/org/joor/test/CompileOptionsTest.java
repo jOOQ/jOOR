@@ -15,9 +15,8 @@ package org.joor.test;
 
 import java.util.Collections;
 
-import java.util.Locale;
+
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.processing.Completion;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -28,7 +27,6 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.tools.Diagnostic;
 
 import org.joor.CompileOptions;
 import org.joor.Reflect;
@@ -156,7 +154,6 @@ public class CompileOptionsTest {
 
         @Override
         public void init(ProcessingEnvironment processingEnv) {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "running " + getClass().getName());
         }
 
         @Override
@@ -182,16 +179,10 @@ public class CompileOptionsTest {
      * see https://docs.oracle.com/javase/7/docs/technotes/tools/windows/javac.html
      */
     @Test
-    public void testProcOnlyWithDiagnostics() {
-        AtomicReference<String> diagMessage = new AtomicReference<>();
+    public void testProcOnly() {
         Object result = Reflect.compile("p.D", "package p; public class D extends B {} class B {}",
-                                        new CompileOptions().options("-proc:only")
-                                                .processors(new AProcessor())
-                                                .withDiagnosticListener(diagnostic -> {
-                                                    diagMessage.set(diagnostic.getMessage(Locale.ENGLISH));
-                                                }));
+                                        new CompileOptions().options("-proc:only").processors(new AProcessor()));
         assertNull(result);
-        assertNotNull(diagMessage.get());
     }
 
 }
