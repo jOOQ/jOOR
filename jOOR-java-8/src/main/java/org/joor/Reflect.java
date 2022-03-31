@@ -26,6 +26,7 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -198,7 +199,7 @@ public class Reflect {
      * @return A wrapped class object, to be used for further reflection.
      */
     public static Reflect onClass(Class<?> clazz) {
-        return new Reflect(clazz);
+        return Objects.isNull(clazz) ? null : new Reflect(clazz);
     }
 
     /**
