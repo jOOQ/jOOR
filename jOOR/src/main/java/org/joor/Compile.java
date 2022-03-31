@@ -112,7 +112,7 @@ class Compile {
                     result = fileManager.loadAndReturnMainClass(className,
                         (name, bytes) -> Reflect.on(cl).call("defineClass", name, bytes, 0, bytes.length).get());
                 }
-                /* [java-9] */
+                /* [java-11] */
 
                 // Lookup.defineClass() has only been introduced in Java 9. It is
                 // required to get private-access to interfaces in the class hierarchy
@@ -151,7 +151,7 @@ class Compile {
                             (name, bytes) -> c.loadClass(name));
                     }
                 }
-                /* [/java-9] */
+                /* [/java-11] */
 
                 return result;
             }
@@ -164,7 +164,7 @@ class Compile {
         }
     }
 
-    /* [java-9] */
+    /* [java-11] */
     static final class ByteArrayClassLoader extends ClassLoader {
         private final Map<String, byte[]> classes;
 
@@ -184,7 +184,7 @@ class Compile {
                 return defineClass(name, bytes, 0, bytes.length);
         }
     }
-    /* [/java-9] */
+    /* [/java-11] */
 
     static final class JavaFileObject extends SimpleJavaFileObject {
         final ByteArrayOutputStream os = new ByteArrayOutputStream();

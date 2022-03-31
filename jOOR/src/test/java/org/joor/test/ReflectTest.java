@@ -55,7 +55,7 @@ import org.junit.rules.ExpectedException;
  */
 public class ReflectTest {
 
-    static final boolean JDK9 = false /* [java-9] */ || true /* [/java-9] */;
+    static final boolean JDK9 = false /* [java-11] */ || true /* [/java-11] */;
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();

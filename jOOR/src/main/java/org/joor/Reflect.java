@@ -291,11 +291,11 @@ public class Reflect {
     static {
         Constructor<MethodHandles.Lookup> result;
 
-        /* [java-9] */
+        /* [java-11] */
         if (true)
             result = null;
         else
-        /* [/java-9] */
+        /* [/java-11] */
         try {
             try {
                 Optional.class.getMethod("stream");
@@ -781,11 +781,11 @@ public class Reflect {
                         // Java 9 version
                         if (CACHED_LOOKUP_CONSTRUCTOR == null) {
 
-                            /* [java-9] */
+                            /* [java-11] */
                             proxyLookup = MethodHandles
                                 .privateLookupIn(proxyType, MethodHandles.lookup())
                                 .in(proxyType);
-                            /* [/java-9] */
+                            /* [/java-11] */
 
                             // Java 9 version for Java 8 distribution (jOOQ Open Source Edition)
                             if (proxyLookup == null)

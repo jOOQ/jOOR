@@ -47,7 +47,7 @@ public class CompileTest {
         assertEquals(new ArrayList<Object>(), v.validateTestClass(null));
     }
 
-    @Test /* [java-9] */ (expected = Throwable.class) // [#77] /* [/java-9] */
+    @Test /* [java-11] */ (expected = Throwable.class) // [#77] /* [/java-11] */
     public void testCompileLocalInterfaceHierarchy() throws Exception {
         I i = Reflect.compile("org.joor.test.CompileTest1", "package org.joor.test; public class CompileTest1 implements org.joor.test.I {}").create().get();
         assertEquals("I.m()", i.m());
@@ -86,7 +86,7 @@ public class CompileTest {
         assertEquals("Hello World!", supplier.get());
     }
 
-    @Test/* [java-9] */ (expected = Throwable.class) // [#76] /* [/java-9] */
+    @Test/* [java-11] */ (expected = Throwable.class) // [#76] /* [/java-11] */
     public void testRecompileSameClassName() {
 
         // The class loader will cache the class name by default, so a new content shouldn't affect the type
@@ -201,7 +201,7 @@ public class CompileTest {
         assertEquals("p.B", d.getSuperclass().getName());
     }
 
-    /* [java-9] */
+    /* [java-11] */
 
     // This test seems to fail in Java 8. p.B doesn't correctly extend p.C
     @Test
@@ -224,7 +224,7 @@ public class CompileTest {
         assertEquals("p.E", c.getInterfaces()[0].getInterfaces()[0].getName());
     }
 
-    /* [/java-9] */
+    /* [/java-11] */
 }
 
 interface I extends J {
