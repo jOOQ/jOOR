@@ -28,7 +28,7 @@ import javax.annotation.processing.Processor;
 public final class CompileOptions {
 
     final List<? extends Processor> processors;
-    final List<String> options;
+    final List<String>              options;
 
     public CompileOptions() {
         this(
@@ -61,12 +61,11 @@ public final class CompileOptions {
         return new CompileOptions(processors, newOptions);
     }
 
-    public boolean hashOption(String opt) {
-        for (String option : options) {
-            if (option.equalsIgnoreCase(opt)) {
+    final boolean hasOption(String opt) {
+        for (String option : options)
+            if (option.equalsIgnoreCase(opt))
                 return true;
-            }
-        }
+
         return false;
     }
 }

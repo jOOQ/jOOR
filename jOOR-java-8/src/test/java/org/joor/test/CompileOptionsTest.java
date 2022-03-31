@@ -13,9 +13,15 @@
  */
 package org.joor.test;
 
+
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Collections;
-
-
 import java.util.Set;
 
 import javax.annotation.processing.Completion;
@@ -32,8 +38,6 @@ import org.joor.CompileOptions;
 import org.joor.Reflect;
 import org.joor.ReflectException;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Lukas Eder
@@ -179,12 +183,34 @@ public class CompileOptionsTest {
      * see https://docs.oracle.com/javase/7/docs/technotes/tools/windows/javac.html
      */
     @Test
-    public void testProcOnly() {
-        Object result = Reflect.compile("p.D", "package p; public class D extends B {} class B {}",
-                                        new CompileOptions().options("-proc:only").processors(new AProcessor()));
-        assertNull(result);
+    public void testCompileProcOnly() {
+        AProcessor p = new AProcessor();
+
+        try {
+            Reflect.compile(
+                "p.D",
+                "package p; public class D extends B {} class B {}",
+                new CompileOptions().options("-proc:only").processors(p)
+            );
+
+            fail("-proc:only does not produce compilation output");
+        }
+        catch (ReflectException expected) {
+            assertTrue(p.processed);
+        }
     }
 
+    @Test
+    public void testProcess() {
+        AProcessor p = new AProcessor();
+        Reflect.process(
+            "p.D",
+            "package p; public class D extends B {} class B {}",
+            new CompileOptions().processors(p)
+        );
+
+        assertTrue(p.processed);
+    }
 }
 
 @interface A {}

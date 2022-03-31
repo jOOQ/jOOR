@@ -54,6 +54,10 @@ import javax.tools.ToolProvider;
 class Compile {
 
     static Class<?> compile(String className, String content, CompileOptions compileOptions) {
+        return compile(className, content, compileOptions, true);
+    }
+
+    static Class<?> compile(String className, String content, CompileOptions compileOptions, boolean expectResult) {
         Lookup lookup = MethodHandles.lookup();
         ClassLoader cl = lookup.lookupClass().getClassLoader();
 
@@ -103,9 +107,9 @@ class Compile {
                 task.call();
 
                 if (fileManager.isEmpty()) {
-                    if (compileOptions.hashOption("-proc:only")) {
+                    if (!expectResult)
                         return null;
-                    }
+
                     throw new ReflectException("Compilation error: " + out);
                 }
 
@@ -266,21 +270,21 @@ class Compile {
 
             // Try at most n times
             for (int i1 = 0; i1 < n1 && !queue.isEmpty(); i1++) {
-            	int n2 = queue.size();
+                int n2 = queue.size();
 
-            	for (int i2 = 0; i2 < n2; i2 ++) {
-	            	Entry<String, byte[]> entry = queue.pop();
+                for (int i2 = 0; i2 < n2; i2++) {
+                    Entry<String, byte[]> entry = queue.pop();
 
-	            	try {
-		                Class<?> c = definer.apply(entry.getKey(), entry.getValue());
+                    try {
+                        Class<?> c = definer.apply(entry.getKey(), entry.getValue());
 
-		                if (mainClassName.equals(entry.getKey()))
-		                    result = c;
-	            	}
-	            	catch (ReflectException e) {
-	            		queue.offer(entry);
-	            	}
-            	}
+                        if (mainClassName.equals(entry.getKey()))
+                            result = c;
+                    }
+                    catch (ReflectException e) {
+                        queue.offer(entry);
+                    }
+                }
             }
 
             return result;
