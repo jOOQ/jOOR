@@ -95,7 +95,7 @@ class Compile {
                     options.addAll(Arrays.asList("-classpath", classpath.toString()));
                 }
 
-                CompilationTask task = compiler.getTask(out, fileManager, null, options, null, files);
+                CompilationTask task = compiler.getTask(out, fileManager, compileOptions.diagnosticListener, options, null, files);
 
                 if (!compileOptions.processors.isEmpty())
                     task.setProcessors(compileOptions.processors);
@@ -103,7 +103,7 @@ class Compile {
                 task.call();
 
                 if (fileManager.isEmpty()) {
-                    if (compileOptions.hashOption("-proc:only")) {
+                    if (compileOptions.hasOption("-proc:only")) {
                         return null;
                     }
                     throw new ReflectException("Compilation error: " + out);
