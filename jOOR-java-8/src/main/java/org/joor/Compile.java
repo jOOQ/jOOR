@@ -102,8 +102,12 @@ class Compile {
 
                 task.call();
 
-                if (fileManager.isEmpty())
+                if (fileManager.isEmpty()) {
+                    if (compileOptions.hashOption("-proc:only")) {
+                        return null;
+                    }
                     throw new ReflectException("Compilation error: " + out);
+                }
 
                 Class<?> result = null;
 

@@ -13,14 +13,10 @@
  */
 package org.joor.test;
 
-import java.io.Serializable;
 import java.util.Collections;
 
 
-
-import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import javax.annotation.processing.Completion;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -35,7 +31,6 @@ import javax.lang.model.element.TypeElement;
 import org.joor.CompileOptions;
 import org.joor.Reflect;
 import org.joor.ReflectException;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -178,6 +173,18 @@ public class CompileOptionsTest {
             return Collections.emptyList();
         }
     }
+
+    /**
+     * -proc:only is a standard option and should be supported.
+     * see https://docs.oracle.com/javase/7/docs/technotes/tools/windows/javac.html
+     */
+    @Test
+    public void testProcOnly() {
+        Object result = Reflect.compile("p.D", "package p; public class D extends B {} class B {}",
+                                        new CompileOptions().options("-proc:only").processors(new AProcessor()));
+        assertNull(result);
+    }
+
 }
 
 @interface A {}

@@ -60,5 +60,14 @@ public final class CompileOptions {
     public final CompileOptions options(List<String> newOptions) {
         return new CompileOptions(processors, newOptions);
     }
+
+    public boolean hashOption(String opt) {
+        for (String option : options) {
+            if (option.equalsIgnoreCase(opt)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
