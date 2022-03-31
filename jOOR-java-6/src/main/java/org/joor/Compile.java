@@ -270,6 +270,7 @@ package org.joor;
 
 
 
+<<<<<<< HEAD
 
 
 
@@ -311,3 +312,5 @@ package org.joor;
 
 
 
+=======
+>>>>>>> refs/remotes/origin/master

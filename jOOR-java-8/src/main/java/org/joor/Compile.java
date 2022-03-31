@@ -67,6 +67,9 @@ class Compile {
         catch (ClassNotFoundException ignore) {
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
+            if (compiler == null)
+                throw new ReflectException("No compiler was provided by ToolProvider.getSystemJavaCompiler(). Make sure the jdk.compiler module is available.");
+
             try {
                 ClassFileManager fileManager = new ClassFileManager(compiler.getStandardFileManager(null, null, null));
 
