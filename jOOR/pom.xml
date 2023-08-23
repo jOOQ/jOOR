@@ -88,13 +88,23 @@
     <profiles>
         <profile>
             <id>release-oss</id>
+
+            <!-- Content from deprecated https://search.maven.org/artifact/org.sonatype.oss/oss-parent/9/pom -->
+            <distributionManagement>
+                <repository>
+                    <id>sonatype-nexus-staging</id>
+                    <name>Nexus Release Repository</name>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+
             <build>
                 <plugins>
                     <plugin>
-                        <inherited>true</inherited>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>2.1.2</version>
+                        <version>3.2.1</version>
+                        <inherited>true</inherited>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -103,7 +113,6 @@
                                 </goals>
                             </execution>
                         </executions>
-
                         <configuration>
                             <excludeResources>true</excludeResources>
                             <useDefaultExcludes>true</useDefaultExcludes>
@@ -111,10 +120,10 @@
                     </plugin>
 
                     <plugin>
-                        <inherited>true</inherited>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.0.0-M1</version>
+                        <version>3.5.0</version>
+                        <inherited>true</inherited>
                         <executions>
                             <execution>
                                 <id>bundle-sources</id>
@@ -129,9 +138,12 @@
                             <encoding>UTF-8</encoding>
                             <show>protected</show>
                             <notree>true</notree>
+                            <!-- Explicit configuration of javadoc language to avoid defaulting to build system's configuration -->
+                            <locale>en</locale>
 
                             <!-- Avoid running into Java 8's very restrictive doclint issues -->
                             <additionalparam>-Xdoclint:none</additionalparam>
+                            <additionalOptions>-Xdoclint:none</additionalOptions>
                         </configuration>
                     </plugin>
 
@@ -163,7 +175,7 @@
                     <plugin>
                         <groupId>com.google.code.maven-replacer-plugin</groupId>
                         <artifactId>replacer</artifactId>
-                        <version>1.5.2</version>
+                        <version>1.5.3</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -182,19 +194,18 @@
                             </includes>
                             <replacements>
                                 <replacement>
-                                    <token><![CDATA[<body>]]></token>
-                                    <value><![CDATA[<body>
-                                        <script type="text/javascript">
-                                          var _gaq = _gaq || [];
-                                          _gaq.push(['_setAccount', 'UA-30716479-1']);
-                                          _gaq.push(['_trackPageview']);
+                                    <token><![CDATA[</body>]]></token>
+                                    <value><![CDATA[
+                                        <!-- Google tag (gtag.js) -->
+                                        <script async src="https://www.googletagmanager.com/gtag/js?id=G-PB08BGF2SR"></script>
+                                        <script>
+                                        window.dataLayer = window.dataLayer || [];
+                                        function gtag(){dataLayer.push(arguments);}
+                                        gtag('js', new Date());
 
-                                          (function() {
-                                            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                                            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                                            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-                                          })();
+                                        gtag('config', 'G-PB08BGF2SR');
                                         </script>
+                                        </body>
                                     ]]></value>
                                 </replacement>
                             </replacements>
@@ -204,7 +215,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.1</version>
+                        <version>3.0.1</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -212,6 +223,12 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -219,6 +236,7 @@
             </build>
         </profile>
     </profiles>
+
     <issueManagement>
         <system>GitHub</system>
         <url>https://github.com/jOOQ/jOOR/issues</url>
