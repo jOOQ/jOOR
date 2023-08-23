@@ -51,7 +51,6 @@ public class CompileOptionsTest {
         AtomicBoolean called = new AtomicBoolean();
         CompileOptions co = new CompileOptions().classLoader(new ClassLoader() {
 
-            // This wasn't called in Java 8 yet (?)
             protected Class<?> findClass(String name) {
                 called.set(true);
                 return Object.class;
