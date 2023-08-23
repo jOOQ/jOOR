@@ -21,8 +21,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.processing.Completion;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -44,6 +46,36 @@ import org.junit.Test;
  */
 public class CompileOptionsTest {
 
+    @Test
+    public void testCompileWithCustomClassLoader() throws Exception {
+        AtomicBoolean called = new AtomicBoolean();
+        CompileOptions co = new CompileOptions().classLoader(new ClassLoader() {
+
+            protected Class<?> findClass(String name) {
+                called.set(true);
+                return Object.class;
+            }
+
+            public Class<?> loadClass(String name) {
+                called.set(true);
+                return Object.class;
+            }
+        });
+
+        String className = "com.example.CompileWithCustomClassLoader";
+        String classCode =
+                "package com.example;\n" +
+                        "class CompileWithCustomClassLoader implements java.io.Serializable {}\n";
+
+        Object o1 = Reflect.compile(className, classCode).create().get();
+        assertEquals(className, o1.getClass().getName());
+        assertTrue(o1 instanceof Serializable);
+
+        Object o2 = Reflect.compile(className, classCode, co).create().get();
+        assertTrue(called.get());
+        assertEquals("java.lang.Object", o2.getClass().getName());
+        assertFalse(o2 instanceof Serializable);
+    }
     @Test
     public void testCompileWithExtraOptions() {
         assertEquals("org.joor.test.Source7OK", Reflect.compile(

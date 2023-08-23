@@ -59,7 +59,9 @@ class Compile {
 
     static Class<?> compile(String className, String content, CompileOptions compileOptions, boolean expectResult) {
         Lookup lookup = MethodHandles.lookup();
-        ClassLoader cl = lookup.lookupClass().getClassLoader();
+        ClassLoader cl = compileOptions.classLoader != null
+            ? compileOptions.classLoader
+            : lookup.lookupClass().getClassLoader();
 
         try {
             return cl.loadClass(className);
