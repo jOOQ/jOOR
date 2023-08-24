@@ -6,7 +6,7 @@
 
     <groupId>org.jooq</groupId>
     <artifactId>joor</artifactId>
-    <version>0.9.15</version>
+    <version>0.9.16-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <name>jOOR</name>
