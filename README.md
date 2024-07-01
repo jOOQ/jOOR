@@ -17,7 +17,7 @@ None!
 <dependency>
   <groupId>org.jooq</groupId>
   <artifactId>joor</artifactId>
-  <version>0.9.14</version>
+  <version>0.9.15</version>
 </dependency>
 ```
 
@@ -27,7 +27,7 @@ None!
 <dependency>
   <groupId>org.jooq</groupId>
   <artifactId>joor-java-8</artifactId>
-  <version>0.9.14</version>
+  <version>0.9.15</version>
 </dependency>
 ```
 
@@ -37,7 +37,7 @@ None!
 <dependency>
   <groupId>org.jooq</groupId>
   <artifactId>joor-java-6</artifactId>
-  <version>0.9.14</version>
+  <version>0.9.15</version>
 </dependency>
 ```
 
