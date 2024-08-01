@@ -247,8 +247,8 @@
                                 </goals>
                                 <configuration>
                                     <target>
-                                        <delete file="${project.build.directory}/${artifactId}-${version}-javadoc.jar"/>
-                                        <zip basedir="${project.build.directory}/apidocs" destfile="${project.build.directory}/${artifactId}-${version}-javadoc.jar"/>
+                                        <delete file="${project.build.directory}/${project.artifactId}-${project.version}-javadoc.jar"/>
+                                        <zip basedir="${project.build.directory}/apidocs" destfile="${project.build.directory}/${project.artifactId}-${project.version}-javadoc.jar"/>
                                     </target>
                                 </configuration>
                             </execution>
