@@ -21,11 +21,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Completion;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
@@ -168,6 +171,63 @@ public class CompileOptionsTest {
             new CompileOptions().processors(p)
         ).create().get();
         assertTrue(p.processed);
+    }
+
+    @Test
+    public void testCompileWithGeneratedPackageInfo() {
+        assertEquals("org.joor.test.GeneratedPackageInfoTest", compileWithGeneratedSource(
+            "GeneratedPackageInfoTest", "", "package-info", "package org.joor.test;"
+        ).getName());
+    }
+
+    @Test
+    public void testCompileWithGeneratedClass() {
+        Class<?> type = compileWithGeneratedSource(
+            "GeneratedClassTest", "public int value() { return GeneratedValue.value(); }",
+            "GeneratedValue", "package org.joor.test; class GeneratedValue {"
+                            + " static int value() { return 42; } }"
+        );
+        assertEquals(42, (int) Reflect.onClass(type).create().call("value").get());
+    }
+
+    private Class<?> compileWithGeneratedSource(String mainName, String mainBody,
+            String generatedName, String generatedSource) {
+        Class<?> type = Reflect.compile(
+            "org.joor.test." + mainName,
+            "package org.joor.test; public class " + mainName + " {" + mainBody + "}",
+            new CompileOptions().processors(new AbstractProcessor() {
+                private boolean generated;
+
+                @Override
+                public Set<String> getSupportedAnnotationTypes() {
+                    return Collections.singleton("*");
+                }
+
+                @Override
+                public SourceVersion getSupportedSourceVersion() {
+                    return SourceVersion.latestSupported();
+                }
+
+                @Override
+                public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+                    if (!generated) {
+                        generated = true;
+
+                        try (Writer writer = processingEnv.getFiler()
+                                .createSourceFile("org.joor.test." + generatedName).openWriter()) {
+                            writer.write(generatedSource);
+                        }
+                        catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    return false;
+                }
+            })
+        ).type();
+
+        return type;
     }
 
     static class AProcessor implements Processor {
