@@ -26,6 +26,7 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.joor.Reflect;
@@ -497,6 +498,44 @@ public class ReflectTest {
             fail();
         }
         catch (ReflectException expected) {}
+    }
+
+    @Test
+    public void testMapProxyWithTurkishLocale() {
+        Locale previous = Locale.getDefault();
+
+        try {
+            Locale.setDefault(new Locale("tr", "TR"));
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("i", "initial");
+            map.put("id", "original");
+            map.put("initialized", true);
+
+            LocaleMapProxy proxy = on(map).as(LocaleMapProxy.class);
+            assertEquals("initial", proxy.getI());
+            assertEquals("original", proxy.getId());
+            assertTrue(proxy.isInitialized());
+
+            proxy.setI("changed");
+            proxy.setId("updated");
+            proxy.setInitialized(false);
+            assertEquals("changed", map.get("i"));
+            assertEquals("updated", map.get("id"));
+            assertEquals(false, map.get("initialized"));
+            assertEquals(3, map.size());
+        }
+        finally {
+            Locale.setDefault(previous);
+        }
+    }
+
+    public interface LocaleMapProxy {
+        String getI();
+        void setI(String value);
+        String getId();
+        void setId(String value);
+        boolean isInitialized();
+        void setInitialized(boolean value);
     }
 
     @Test
