@@ -671,4 +671,18 @@ public class ReflectTest {
         assertEquals(c, Character.class);
         assertEquals(v, Void.class);
     }
+
+    @Test
+    public void testNullEquality() {
+        assertEquals(on((Object) null), on((Object) null));
+        assertFalse(on((Object) null).equals(on((Object) "value")));
+        assertFalse(on((Object) "value").equals(on((Object) null)));
+        assertFalse(on((Object) null).equals(null));
+    }
+
+    @Test
+    public void testNullHashCode() {
+        assertEquals(0, on((Object) null).hashCode());
+    }
+
 }

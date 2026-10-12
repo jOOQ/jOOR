@@ -933,13 +933,14 @@ public class Reflect {
 
     @Override
     public int hashCode() {
-        return object.hashCode();
+        return object == null ? 0 : object.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Reflect) {
-            return object.equals(((Reflect) obj).get());
+            Object other = ((Reflect) obj).get();
+            return object == null ? other == null : object.equals(other);
         }
 
         return false;
