@@ -6,7 +6,7 @@
 
     <groupId>org.jooq</groupId>
     <artifactId>joor</artifactId>
-    <version>0.9.16-SNAPSHOT</version>
+    <version>0.9.16</version>
     <packaging>bundle</packaging>
 
     <name>jOOR</name>
@@ -83,17 +83,27 @@
         <profile>
             <id>release-oss</id>
 
-            <!-- Content from deprecated https://search.maven.org/artifact/org.sonatype.oss/oss-parent/9/pom -->
             <distributionManagement>
                 <repository>
                     <id>sonatype-nexus-staging</id>
                     <name>Nexus Release Repository</name>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                    <url>https://central.sonatype.org/service/local/staging/deploy/maven2/</url>
                 </repository>
             </distributionManagement>
 
             <build>
                 <plugins>
+                    <!-- New release mechanism: https://central.sonatype.org/publish/publish-portal-maven/ -->
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.11.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>sonatype-nexus-staging</publishingServerId>
+                        </configuration>
+                    </plugin>
+
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
