@@ -63,14 +63,15 @@ public class Reflect {
      * <p>
      * For example:
      * <pre><code>
-     * Supplier&lt;String&gt; supplier = Reflect.compile("org.joor.Test", """
-     *   package org.joor;
-     *   class Test implements java.util.function.Supplier&lt;String&gt; {
-     *     public String get() {
-     *       return "Hello World!";
-     *     }
-     *   }
-     *   """).create().get();
+     * Supplier&lt;String&gt; supplier = Reflect.compile("org.joor.Test", ("" +
+     "*   package org.joor;\n" +
+     "*   class Test implements java.util.function.Supplier&lt;String&gt; {\n" +
+     "*     public String get() {\n" +
+     "*       return \"Hello World!\";\n" +
+     "*     }\n" +
+     "*   }\n" +
+     "*   " +
+     "")).create().get();
      * </code></pre>
      *
      * @param name The qualified class name
@@ -87,14 +88,15 @@ public class Reflect {
      * <p>
      * For example:
      * <pre><code>
-     * Supplier&lt;String&gt; supplier = Reflect.compile("org.joor.Test", """
-     *   package org.joor;
-     *   class Test implements java.util.function.Supplier&lt;String&gt; {
-     *     public String get() {
-     *       return "Hello World!";
-     *     }
-     *   }
-     *   """).create().get();
+     * Supplier&lt;String&gt; supplier = Reflect.compile("org.joor.Test", ("" +
+     "*   package org.joor;\n" +
+     "*   class Test implements java.util.function.Supplier&lt;String&gt; {\n" +
+     "*     public String get() {\n" +
+     "*       return \"Hello World!\";\n" +
+     "*     }\n" +
+     "*   }\n" +
+     "*   " +
+     "")).create().get();
      * </code></pre>
      *
      * @param name The qualified class name
@@ -116,15 +118,16 @@ public class Reflect {
 	 * <p>
 	 * For example:
      * <pre><code>
-     * Supplier&lt;String&gt; supplier = Reflect.compile("org.joor.Test", """
-     *   package org.joor;
-     *   &#64;MyAnnotation
-     *   class Test implements java.util.function.Supplier&lt;String&gt; {
-     *     public String get() {
-     *       return "Hello World!";
-     *     }
-     *   }
-     *   """).create().get();
+     * Supplier&lt;String&gt; supplier = Reflect.compile("org.joor.Test", ("" +
+     "*   package org.joor;\n" +
+     "*   &#64;MyAnnotation\n" +
+     "*   class Test implements java.util.function.Supplier&lt;String&gt; {\n" +
+     "*     public String get() {\n" +
+     "*       return \"Hello World!\";\n" +
+     "*     }\n" +
+     "*   }\n" +
+     "*   " +
+     "")).create().get();
      * </code></pre>
 	 *
 	 * @param name    The qualified class name
@@ -144,15 +147,16 @@ public class Reflect {
      * <p>
      * For example:
      * <pre><code>
-     * Supplier&lt;String&gt; supplier = Reflect.compile("org.joor.Test", """
-     *   package org.joor;
-     *   &#64;MyAnnotation
-     *   class Test implements java.util.function.Supplier&lt;String&gt; {
-     *     public String get() {
-     *       return "Hello World!";
-     *     }
-     *   }
-     *   """).create().get();
+     * Supplier&lt;String&gt; supplier = Reflect.compile("org.joor.Test", ("" +
+     "*   package org.joor;\n" +
+     "*   &#64;MyAnnotation\n" +
+     "*   class Test implements java.util.function.Supplier&lt;String&gt; {\n" +
+     "*     public String get() {\n" +
+     "*       return \"Hello World!\";\n" +
+     "*     }\n" +
+     "*   }\n" +
+     "*   " +
+     "")).create().get();
      * </code></pre>
      *
      * @param name The qualified class name
