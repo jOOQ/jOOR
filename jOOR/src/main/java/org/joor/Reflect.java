@@ -54,6 +54,10 @@ import java.util.Optional;
  */
 public class Reflect {
 
+    public static CompilationUnit.Result compileUnit(CompilationUnit unit) throws ReflectException {
+        return MultiCompile.compileUnit(unit, new CompileOptions());
+    }
+
     // ---------------------------------------------------------------------
     // Static API used as entrance points to the fluent API
     // ---------------------------------------------------------------------
