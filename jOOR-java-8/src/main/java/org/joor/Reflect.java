@@ -848,6 +848,13 @@ public class Reflect {
 
 
                     if (method.isDefault()) {
+                        Class<?> lookupType = proxyType;
+                        if (!method.getDeclaringClass().isAssignableFrom(lookupType))
+                            for (Class<?> additionalInterface : additionalInterfaces)
+                                if (method.getDeclaringClass().isAssignableFrom(additionalInterface)) {
+                                    lookupType = additionalInterface;
+                                    break;
+                                }
                         Lookup proxyLookup = null;
 
                         // Java 9 version
@@ -862,16 +869,16 @@ public class Reflect {
                             // Java 9 version for Java 8 distribution (jOOQ Open Source Edition)
                             if (proxyLookup == null)
                                 proxyLookup = onClass(MethodHandles.class)
-                                    .call("privateLookupIn", proxyType, MethodHandles.lookup())
-                                    .call("in", proxyType)
+                                    .call("privateLookupIn", lookupType, MethodHandles.lookup())
+                                    .call("in", lookupType)
                                     .<Lookup> get();
                         }
 
                         // Java 8 version
                         else
-                            proxyLookup = CACHED_LOOKUP_CONSTRUCTOR.newInstance(proxyType);
+                            proxyLookup = CACHED_LOOKUP_CONSTRUCTOR.newInstance(lookupType);
 
-                        return proxyLookup.unreflectSpecial(method, proxyType)
+                        return proxyLookup.unreflectSpecial(method, lookupType)
                             .bindTo(proxy)
                             .invokeWithArguments(args);
                     }

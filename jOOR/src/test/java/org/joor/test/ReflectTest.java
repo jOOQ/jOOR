@@ -463,6 +463,21 @@ public class ReflectTest {
     }
 
     @Test
+    public void testDefaultMethodsFromAdditionalInterfaces() {
+        Object proxy = on(new Object()).as(PartialStringAPI1.class, InterfaceWithDefaultMethods.class);
+        assertEquals(42, ((InterfaceWithDefaultMethods) proxy).returnAnInt());
+    }
+
+    public interface DefaultPredicate extends java.util.function.Predicate<Object> {}
+
+    @Test
+    public void testInheritedJdkDefaultMethods() {
+        assertTrue(on(new Object()).as(DefaultPredicate.class).negate() != null);
+        Object proxy = on(new Object()).as(PartialStringAPI1.class, DefaultPredicate.class);
+        assertTrue(((DefaultPredicate) proxy).negate() != null);
+    }
+
+    @Test
     public void testMapProxy() {
 
         @SuppressWarnings({ "unused", "serial" })
