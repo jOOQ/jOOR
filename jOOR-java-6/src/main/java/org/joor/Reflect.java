@@ -25,11 +25,13 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 // ...
+import java.util.Set;
 
 /**
  * A wrapper for an {@link Object} or {@link Class} upon which reflective calls
@@ -818,63 +820,73 @@ public class Reflect {
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 String name = method.getName();
+                ReflectException e = null;
 
-                // Actual method name matches always come first
-                try {
-                    return on(type, object).call(name, args).get();
+                // Actual method name matches always come first, unless the
+                // wrapped type has no method of that name at all, in case of
+                // which the lookup can only fail, expensively, through several
+                // exceptions and full method scans (e.g. for every setter call
+                // on a wrapped map object)
+                if (hasMethod(type, name)) {
+                    try {
+                        return on(type, object).call(name, args).get();
+                    }
+                    catch (ReflectException x) {
+                        e = x;
+                    }
                 }
 
                 // [#14] Emulate POJO behaviour on wrapped map objects
-                catch (ReflectException e) {
-                    if (isMap) {
-                        Map<String, Object> map = (Map<String, Object>) object;
-                        int length = (args == null ? 0 : args.length);
+                if (isMap) {
+                    Map<String, Object> map = (Map<String, Object>) object;
+                    int length = (args == null ? 0 : args.length);
 
-                        if (length == 0 && name.startsWith("get")) {
-                            return map.get(property(name.substring(3)));
-                        }
-                        else if (length == 0 && name.startsWith("is")) {
-                            return map.get(property(name.substring(2)));
-                        }
-                        else if (length == 1 && name.startsWith("set")) {
-                            map.put(property(name.substring(3)), args[0]);
-                            return null;
-                        }
+                    if (length == 0 && name.startsWith("get")) {
+                        return map.get(property(name.substring(3)));
                     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    throw e;
+                    else if (length == 0 && name.startsWith("is")) {
+                        return map.get(property(name.substring(2)));
+                    }
+                    else if (length == 1 && name.startsWith("set")) {
+                        map.put(property(name.substring(3)), args[0]);
+                        return null;
+                    }
                 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                throw e != null ? e : new ReflectException(new NoSuchMethodException(
+                    "No similar method " + name + " with params " + Arrays.toString(types(args)) + " could be found on type " + type + "."
+                ));
             }
         };
 
@@ -882,6 +894,46 @@ public class Reflect {
         interfaces[0] = proxyType;
         System.arraycopy(additionalInterfaces, 0, interfaces, 1, additionalInterfaces.length);
         return (P) Proxy.newProxyInstance(proxyType.getClassLoader(), interfaces, handler);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Whether {@link #call(String, Object...)} can possibly find a method
+     * called <code>name</code> on <code>type</code>.
+     * <p>
+     * A <code>false</code> result is definitive, a <code>true</code> result
+     * isn't, as argument types are not taken into account.
+     */
+    private static boolean hasMethod(Class<?> type, String name) {
+
+
+
+
+
+        return true;
     }
 
     /**

@@ -539,6 +539,39 @@ public class ReflectTest {
     }
 
     @Test
+    public void testMapProxyDispatchesToMapMethods() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        MapLikeProxy proxy = on(map).as(MapLikeProxy.class);
+
+        // Actual map methods take precedence over getter / setter emulation,
+        // even if their names look like getters
+        assertTrue(proxy.isEmpty());
+        proxy.setFoo("abc");
+        assertFalse(proxy.isEmpty());
+        assertEquals(1, proxy.size());
+        assertEquals("abc", proxy.get("foo"));
+        assertEquals("abc", proxy.getFoo());
+        assertFalse(map.containsKey("empty"));
+
+        try {
+            proxy.doesNotExist(1);
+            fail();
+        }
+        catch (ReflectException expected) {
+            assertTrue(expected.getCause() instanceof NoSuchMethodException);
+        }
+    }
+
+    public interface MapLikeProxy {
+        boolean isEmpty();
+        int size();
+        Object get(Object key);
+        String getFoo();
+        void setFoo(String foo);
+        void doesNotExist(int i);
+    }
+
+    @Test
     public void testPrivateField() throws Exception {
         class Foo {
             private String bar;
