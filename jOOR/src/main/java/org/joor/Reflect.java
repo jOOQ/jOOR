@@ -461,14 +461,12 @@ public class Reflect {
             Field field = field0(name);
 
             if ((field.getModifiers() & Modifier.FINAL) == Modifier.FINAL) {
-                try {
-                    Field modifiersField = Field.class.getDeclaredField("modifiers");
-                    modifiersField.setAccessible(true);
-                    modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-                }
+                Field modifiersField = ModifiersField.get();
 
                 // [#48] E.g. Android doesn't have this field
-                catch (NoSuchFieldException ignore) {}
+                // [#139] Neither does JDK 12+
+                if (modifiersField != null)
+                    modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
             }
 
             field.set(object, unwrap(value));
@@ -476,6 +474,49 @@ public class Reflect {
         }
         catch (Exception e) {
             throw new ReflectException(e);
+        }
+    }
+
+    /**
+     * [#139] The <code>Field.modifiers</code> field, looked up only once.
+     * <p>
+     * This is a separate class, so the lookup happens lazily, the first time a
+     * final field is set, and doesn't produce illegal reflective access
+     * warnings on JDK 9 - 11 for users that never set final fields.
+     */
+    private static final class ModifiersField {
+        private static final Field            FIELD;
+        private static final RuntimeException ERROR;
+
+        static {
+            Field field = null;
+            RuntimeException error = null;
+
+            try {
+                field = Field.class.getDeclaredField("modifiers");
+                field.setAccessible(true);
+            }
+
+            // The field doesn't exist on Android or JDK 12+
+            catch (NoSuchFieldException ignore) {
+                field = null;
+            }
+
+            // E.g. the field can't be made accessible
+            catch (RuntimeException e) {
+                field = null;
+                error = e;
+            }
+
+            FIELD = field;
+            ERROR = error;
+        }
+
+        static Field get() {
+            if (ERROR != null)
+                throw ERROR;
+
+            return FIELD;
         }
     }
 
