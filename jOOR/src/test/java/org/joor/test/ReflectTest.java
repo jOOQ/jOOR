@@ -659,6 +659,20 @@ public class ReflectTest {
     }
 
     @Test
+    public void shouldCallDefaultMethodsWithArguments() {
+        // [#140] Repeated calls, on several proxies, use cached method handles
+        for (int i = 0; i < 3; i++) {
+            InterfaceWithDefaultMethods proxy = Reflect.on(new Object()).as(InterfaceWithDefaultMethods.class);
+
+            assertEquals(42, proxy.returnAnInt());
+            assertEquals("1anull", proxy.withArguments(1, "a", null));
+            assertEquals("a,b", proxy.withVarargs("a", "b"));
+            assertEquals("", proxy.withVarargs());
+            proxy.withoutResult();
+        }
+    }
+
+    @Test
     public void shouldThrowExceptionThrownByDefaultMethod(){
         expectedException.expect(IllegalArgumentException.class);
         Reflect.on(new Object()).as(InterfaceWithDefaultMethods.class).throwIllegalArgumentException();

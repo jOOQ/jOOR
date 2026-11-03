@@ -13,8 +13,10 @@
  */
 package org.joor;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -32,6 +34,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * A wrapper for an {@link Object} or {@link Class} upon which reflective calls
@@ -855,32 +859,10 @@ public class Reflect {
 
                 /* [java-8] */
                 if (method.isDefault()) {
-                    Lookup proxyLookup = null;
 
-                    // Java 9 version
-                    if (CACHED_LOOKUP_CONSTRUCTOR == null) {
-
-                        /* [java-11] */
-                        proxyLookup = MethodHandles
-                            .privateLookupIn(proxyType, MethodHandles.lookup())
-                            .in(proxyType);
-                        /* [/java-11] */
-
-                        // Java 9 version for Java 8 distribution (jOOQ Open Source Edition)
-                        if (proxyLookup == null)
-                            proxyLookup = onClass(MethodHandles.class)
-                                .call("privateLookupIn", proxyType, MethodHandles.lookup())
-                                .call("in", proxyType)
-                                .<Lookup> get();
-                    }
-
-                    // Java 8 version
-                    else
-                        proxyLookup = CACHED_LOOKUP_CONSTRUCTOR.newInstance(proxyType);
-
-                    return proxyLookup.unreflectSpecial(method, proxyType)
-                        .bindTo(proxy)
-                        .invokeWithArguments(args);
+                    // invokeExact() needs the exact static argument types
+                    Object[] a = args == null ? NO_ARGS : args;
+                    return (Object) defaultMethodHandle(proxyType, method).invokeExact(proxy, a);
                 }
                 /* [/java-8] */
 
@@ -918,6 +900,68 @@ public class Reflect {
             return result;
         }
     };
+    /* [/java-8] */
+
+    /* [java-8] */
+    /**
+     * [#140] Method handles for default methods, per proxy interface, so they
+     * don't have to be looked up again on every proxy call.
+     */
+    private static final ClassValue<ConcurrentMap<Method, MethodHandle>> DEFAULT_METHOD_HANDLES = new ClassValue<ConcurrentMap<Method, MethodHandle>>() {
+        @Override
+        protected ConcurrentMap<Method, MethodHandle> computeValue(Class<?> type) {
+            return new ConcurrentHashMap<Method, MethodHandle>();
+        }
+    };
+
+    private static final Object[] NO_ARGS = {};
+
+    /**
+     * Get a method handle of type <code>(Object, Object[])Object</code> that
+     * invokes the default method <code>method</code> on a proxy, with
+     * <code>proxyType</code> as the special caller.
+     */
+    private static MethodHandle defaultMethodHandle(Class<?> proxyType, Method method) throws Exception {
+        ConcurrentMap<Method, MethodHandle> handles = DEFAULT_METHOD_HANDLES.get(proxyType);
+        MethodHandle result = handles.get(method);
+
+        if (result == null) {
+            Lookup proxyLookup = null;
+
+            // Java 9 version
+            if (CACHED_LOOKUP_CONSTRUCTOR == null) {
+
+                /* [java-11] */
+                proxyLookup = MethodHandles
+                    .privateLookupIn(proxyType, MethodHandles.lookup())
+                    .in(proxyType);
+                /* [/java-11] */
+
+                // Java 9 version for Java 8 distribution (jOOQ Open Source Edition)
+                if (proxyLookup == null)
+                    proxyLookup = onClass(MethodHandles.class)
+                        .call("privateLookupIn", proxyType, MethodHandles.lookup())
+                        .call("in", proxyType)
+                        .<Lookup> get();
+            }
+
+            // Java 8 version
+            else
+                proxyLookup = CACHED_LOOKUP_CONSTRUCTOR.newInstance(proxyType);
+
+            result = proxyLookup
+                .unreflectSpecial(method, proxyType)
+                .asFixedArity()
+                .asSpreader(Object[].class, method.getParameterTypes().length)
+                .asType(MethodType.methodType(Object.class, Object.class, Object[].class));
+
+            MethodHandle existing = handles.putIfAbsent(method, result);
+            if (existing != null)
+                result = existing;
+        }
+
+        return result;
+    }
     /* [/java-8] */
 
     /**

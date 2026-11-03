@@ -27,4 +27,14 @@ public interface InterfaceWithDefaultMethods {
         throw new IllegalArgumentException("oh oh");
     }
 
+    default String withArguments(int i, String s, Object o) {
+        return i + s + o;
+    }
+
+    default String withVarargs(String... strings) {
+        return String.join(",", strings);
+    }
+
+    default void withoutResult() {}
+
 }
