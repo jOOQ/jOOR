@@ -299,6 +299,37 @@ public class ReflectTest {
         assertNull(accessible(null));
     }
 
+    public static class HidingParent {
+        public String x = "parent";
+    }
+
+    public static class HidingChild extends HidingParent {
+        @SuppressWarnings("unused")
+        private String x = "child";
+    }
+
+    public interface InterfaceWithField {
+        String Y = "interface";
+    }
+
+    public static class ClassWithInterfaceField implements InterfaceWithField {}
+
+    @Test
+    public void testPrivateFieldHidingPublicField() {
+        // [#142] The most specific field wins
+        HidingChild child = new HidingChild();
+        assertEquals("child", on(child).get("x"));
+        assertEquals("child", on(child).field("x").get());
+
+        on(child).set("x", "changed");
+        assertEquals("parent", ((HidingParent) child).x);
+        assertEquals("changed", on(child).get("x"));
+
+        // Public fields from interfaces are still found
+        assertEquals("interface", on(new ClassWithInterfaceField()).get("Y"));
+        assertEquals("interface", onClass(ClassWithInterfaceField.class).get("Y"));
+    }
+
     @Test
     public void testFinalFields() {
 

@@ -524,23 +524,25 @@ public class Reflect {
     private Field field0(String name) throws ReflectException {
         Class<?> t = type();
 
-        // Try getting a public field
-        try {
-            return accessible(t.getField(name));
-        }
-
-        // Try again, getting a non-public field
-        catch (NoSuchFieldException e) {
-            do {
-                try {
-                    return accessible(t.getDeclaredField(name));
-                }
-                catch (NoSuchFieldException ignore) {}
-
-                t = t.getSuperclass();
+        // [#142] Try getting the most specific field first, from the type
+        //        upwards, like the Java language resolves field names. A
+        //        public field of a super class mustn't win over a non-public
+        //        field of the same name in a sub class.
+        do {
+            try {
+                return accessible(t.getDeclaredField(name));
             }
-            while (t != null);
+            catch (NoSuchFieldException ignore) {}
 
+            t = t.getSuperclass();
+        }
+        while (t != null);
+
+        // Try again, getting a public field declared in an interface
+        try {
+            return accessible(type().getField(name));
+        }
+        catch (NoSuchFieldException e) {
             throw new ReflectException(e);
         }
     }
