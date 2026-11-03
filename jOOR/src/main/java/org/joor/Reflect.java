@@ -1025,7 +1025,15 @@ public class Reflect {
 
             if (method.getReturnType() == void.class) {
                 method.invoke(object, args);
-                return on(object);
+
+                // [#141] Keep wrapping the class after calling a static method
+                //        on a class, rather than wrapping the Class instance
+                if (Modifier.isStatic(method.getModifiers())
+                        && object instanceof Class
+                        && method.getDeclaringClass().isAssignableFrom((Class<?>) object))
+                    return onClass((Class<?>) object);
+                else
+                    return on(object);
             }
             else {
                 return on(method.invoke(object, args));

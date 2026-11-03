@@ -176,6 +176,10 @@ public class ReflectTest {
         // Static methods
         // --------------
         assertEquals(Test4.class, onClass(Test4.class).call("s_method").get());
+
+        // [#141] Static calls can be chained after a static void method
+        assertEquals(Test4.class, onClass(Test4.class).call("s_method").type());
+        assertEquals(Test4.class, onClass(Test4.class).call("s_method").call("s_method").get());
     }
 
     @Test
