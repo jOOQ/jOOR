@@ -303,6 +303,33 @@ public class ReflectTest {
         assertNull(accessible(null));
     }
 
+    public interface InterfaceWithConstant {
+        String CONSTANT = "CONSTANT";
+    }
+
+    public static class ClassWithInterfaceConstant implements InterfaceWithConstant {}
+
+    @Test
+    public void testFieldLookup() throws Exception {
+        // [#137] Public fields from interfaces, private fields from super classes, and missing fields
+        assertEquals("CONSTANT", on(new ClassWithInterfaceConstant()).get("CONSTANT"));
+        assertEquals("CONSTANT", onClass(ClassWithInterfaceConstant.class).get("CONSTANT"));
+        assertEquals(0, (int) (Integer) on(new TestHierarchicalMethodsSubclass()).get("invisibleField1"));
+
+        try {
+            on(new TestHierarchicalMethodsSubclass()).get("doesNotExist");
+            fail();
+        }
+        catch (ReflectException expected) {
+            Throwable cause = expected;
+            while (cause.getCause() != null)
+                cause = cause.getCause();
+
+            assertTrue(cause instanceof NoSuchFieldException);
+            assertEquals("doesNotExist", cause.getMessage());
+        }
+    }
+
     @Test
     public void testFinalFields() {
 
