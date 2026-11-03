@@ -571,8 +571,17 @@ public class Reflect {
                 if (type != object ^ Modifier.isStatic(field.getModifiers())) {
                     String name = field.getName();
 
-                    if (!result.containsKey(name))
-                        result.put(name, field(name));
+                    // [#138] Use the field at hand rather than looking it up
+                    //        again by name, which is slower and may find a
+                    //        different field
+                    if (!result.containsKey(name)) {
+                        try {
+                            result.put(name, on(field.getType(), accessible(field).get(object)));
+                        }
+                        catch (Exception e) {
+                            throw new ReflectException(e);
+                        }
+                    }
                 }
             }
 
