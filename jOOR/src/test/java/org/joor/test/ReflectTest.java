@@ -415,6 +415,23 @@ public class ReflectTest {
         assertTrue(on(test2).fields().containsKey("visibleField3"));
     }
 
+    public static class FieldMapParent {
+        public String x = "parent";
+    }
+
+    public static class FieldMapChild extends FieldMapParent {
+        @SuppressWarnings("unused")
+        private String x = "child";
+    }
+
+    @Test
+    public void testFieldMapWithHiddenPublicField() {
+        // [#138] The map contains the most specific field, not the public one
+        Map<String, Reflect> fields = on(new FieldMapChild()).fields();
+        assertEquals(1, fields.size());
+        assertEquals("child", fields.get("x").get());
+    }
+
     @Test
     public void testFieldAdvanced() {
         onClass(Test1.class).set("S_DATA", onClass(Test1.class).create())
