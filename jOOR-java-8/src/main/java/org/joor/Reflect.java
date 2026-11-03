@@ -655,21 +655,20 @@ public class Reflect {
 
         // Try invoking the "canonical" method, i.e. the one with exact
         // matching argument types
-        try {
-            Method method = exactMethod(name, types);
-            return on(method, object, args);
-        }
+        Method method = exactMethod(name, types);
 
         // If there is no exact match, try to find a method that has a "similar"
         // signature if primitive argument types are converted to their wrappers
-        catch (NoSuchMethodException e) {
+        if (method == null) {
             try {
-                Method method = similarMethod(name, types);
-                return on(method, object, args);
-            } catch (NoSuchMethodException e1) {
-                throw new ReflectException(e1);
+                method = similarMethod(name, types);
+            }
+            catch (NoSuchMethodException e) {
+                throw new ReflectException(e);
             }
         }
+
+        return on(method, object, args);
     }
 
     /**
@@ -677,30 +676,48 @@ public class Reflect {
      * <p>
      * If a public method is found in the class hierarchy, this method is returned.
      * Otherwise a private method with the exact same signature is returned.
-     * If no exact match could be found, we let the {@code NoSuchMethodException} pass through.
+     * If no exact match could be found, <code>null</code> is returned.
      */
-    private Method exactMethod(String name, Class<?>[] types) throws NoSuchMethodException {
+    private Method exactMethod(String name, Class<?>[] types) {
+
+        // [#136] A null argument can never match a declared parameter type
+        //        exactly, so don't search for it
+        for (Class<?> type : types)
+            if (type == NULL.class)
+                return null;
+
         Class<?> t = type();
 
         // first priority: find a public method with exact signature match in class hierarchy
         try {
             return t.getMethod(name, types);
         }
+        catch (NoSuchMethodException ignore) {}
 
         // second priority: find a private method with exact signature match on declaring class
-        catch (NoSuchMethodException e) {
-            do {
-                try {
-                    return t.getDeclaredMethod(name, types);
+        // [#136] Scan the declared methods rather than probing each class with
+        //        getDeclaredMethod(), which throws an exception for every miss
+        do {
+            Method result = null;
+
+            for (Method method : t.getDeclaredMethods()) {
+                if (method.getName().equals(name) && Arrays.equals(method.getParameterTypes(), types)) {
+
+                    // Like getDeclaredMethod(), prefer the most specific return
+                    // type if there are several matches (e.g. bridge methods)
+                    if (result == null || result.getReturnType().isAssignableFrom(method.getReturnType()))
+                        result = method;
                 }
-                catch (NoSuchMethodException ignore) {}
-
-                t = t.getSuperclass();
             }
-            while (t != null);
 
-            throw new NoSuchMethodException();
+            if (result != null)
+                return result;
+
+            t = t.getSuperclass();
         }
+        while (t != null);
+
+        return null;
     }
 
     /**

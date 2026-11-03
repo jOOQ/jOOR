@@ -229,6 +229,15 @@ public class ReflectTest {
     }
 
     @Test
+    public void testPrivateMethodsInHierarchyWithBoxingAndNulls() throws Exception {
+        // [#136] Neither of these can match exactly
+        TestHierarchicalMethodsSubclass subclass = new TestHierarchicalMethodsSubclass();
+        assertEquals(TestHierarchicalMethodsBase.PRIVATE_RESULT, on(subclass).call("priv_obj_method", (Object) null).get());
+        assertEquals(TestHierarchicalMethodsBase.PRIVATE_RESULT, on(subclass).call("priv_obj_method", 1).get());
+        assertEquals(TestHierarchicalMethodsSubclass.PRIVATE_RESULT, on(subclass).call("pub_method", 1).get());
+    }
+
+    @Test
     public void testMethodsWithAmbiguity() {
         // [#5] Re-enact when this is implemented
         assumeTrue(false);

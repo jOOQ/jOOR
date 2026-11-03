@@ -34,6 +34,10 @@ public class TestHierarchicalMethodsBase {
         return PRIVATE_RESULT;
     }
 
+    private String priv_obj_method(Object object) {
+        return PRIVATE_RESULT;
+    }
+
     private String very_priv_method() {
         return PRIVATE_RESULT;
     }
