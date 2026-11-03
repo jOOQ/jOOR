@@ -524,25 +524,27 @@ public class Reflect {
     private Field field0(String name) throws ReflectException {
         Class<?> t = type();
 
+        // [#137] Scan the fields rather than probing with getField() and
+        //        getDeclaredField(), which throw an exception for every miss.
+        //        getFields() searches public fields in the same order as
+        //        getField(): declared fields, super interfaces, super classes.
+
         // Try getting a public field
-        try {
-            return accessible(t.getField(name));
-        }
+        for (Field field : t.getFields())
+            if (field.getName().equals(name))
+                return accessible(field);
 
         // Try again, getting a non-public field
-        catch (NoSuchFieldException e) {
-            do {
-                try {
-                    return accessible(t.getDeclaredField(name));
-                }
-                catch (NoSuchFieldException ignore) {}
+        do {
+            for (Field field : t.getDeclaredFields())
+                if (field.getName().equals(name))
+                    return accessible(field);
 
-                t = t.getSuperclass();
-            }
-            while (t != null);
-
-            throw new ReflectException(e);
+            t = t.getSuperclass();
         }
+        while (t != null);
+
+        throw new ReflectException(new NoSuchFieldException(name));
     }
 
     /**
